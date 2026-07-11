@@ -12,6 +12,7 @@ export default function NavBar() {
         <Link to="/ejercicios">Ejercicios</Link>
         <Link to="/sesiones">Sesiones</Link>
         <Link to="/analisis">Analisis</Link>
+        <Link to="/progreso">Progreso</Link>
       </div>
       <div className="navbar-user">
         <span>{usuario?.nombre}</span>

@@ -10,6 +10,7 @@ import SessionsPage from './pages/SessionsPage'
 import SessionFormPage from './pages/SessionFormPage'
 import SessionDetailPage from './pages/SessionDetailPage'
 import MuscleAnalysisPage from './pages/MuscleAnalysisPage'
+import ProgressPage from './pages/ProgressPage'
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="/sesiones/:id" element={<SessionDetailPage />} />
           <Route path="/sesiones/:id/editar" element={<SessionFormPage />} />
           <Route path="/analisis" element={<MuscleAnalysisPage />} />
+          <Route path="/progreso" element={<ProgressPage />} />
         </Route>
       </Routes>
     </AuthProvider>
