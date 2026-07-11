@@ -23,6 +23,16 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
+    @ExceptionHandler(EjercicioDuplicadoException.class)
+    public ResponseEntity<Map<String, Object>> handleEjercicioDuplicado(EjercicioDuplicadoException ex) {
+        return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(EjercicioNoEncontradoException.class)
+    public ResponseEntity<Map<String, Object>> handleEjercicioNoEncontrado(EjercicioNoEncontradoException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidacion(MethodArgumentNotValidException ex) {
         String mensaje = ex.getBindingResult().getFieldErrors().stream()
