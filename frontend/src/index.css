@@ -339,3 +339,23 @@ body {
     align-items: stretch;
   }
 }
+
+.chart-container {
+  position: relative;
+  height: 360px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  padding: 1rem;
+}
+
+.analisis-destacado {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.analisis-nota {
+  margin-top: 0.75rem;
+  color: #52606d;
+  font-size: 0.9rem;
+}

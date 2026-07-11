@@ -9,9 +9,10 @@ export default function DashboardPage() {
       <h1>Hola, {usuario?.nombre}</h1>
       <p>Sesion iniciada con: {usuario?.correo}</p>
       <p>
-        Ya puedes gestionar tu catalogo de <Link to="/ejercicios">ejercicios</Link> y
-        registrar tus <Link to="/sesiones">sesiones de entrenamiento</Link>. El
-        historial detallado y el analisis muscular llegan en los proximos sprints.
+        Ya puedes gestionar tu catalogo de <Link to="/ejercicios">ejercicios</Link>,
+        registrar tus <Link to="/sesiones">sesiones de entrenamiento</Link> y revisar tu{' '}
+        <Link to="/analisis">analisis de grupos musculares</Link>. El seguimiento de
+        progreso por ejercicio llega en el proximo sprint.
       </p>
     </div>
   )
