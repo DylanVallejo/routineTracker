@@ -15,14 +15,16 @@ function formatearFecha(fechaIso) {
 
 export default function SessionList() {
   const [sesiones, setSesiones] = useState([])
+  const [inicio, setInicio] = useState('')
+  const [fin, setFin] = useState('')
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(true)
 
-  async function cargar() {
+  async function cargar(filtro = {}) {
     setCargando(true)
     setError('')
     try {
-      const data = await listarSesiones()
+      const data = await listarSesiones(filtro)
       setSesiones(data)
     } catch (err) {
       setError(err.response?.data?.mensaje || 'No se pudo cargar el listado de sesiones')
@@ -35,11 +37,22 @@ export default function SessionList() {
     cargar()
   }, [])
 
+  function handleFiltrar(event) {
+    event.preventDefault()
+    cargar({ inicio: inicio || undefined, fin: fin || undefined })
+  }
+
+  function handleLimpiarFiltro() {
+    setInicio('')
+    setFin('')
+    cargar()
+  }
+
   async function handleEliminar(id) {
     if (!window.confirm('¿Eliminar esta sesion de entrenamiento?')) return
     try {
       await eliminarSesion(id)
-      cargar()
+      cargar({ inicio: inicio || undefined, fin: fin || undefined })
     } catch (err) {
       setError(err.response?.data?.mensaje || 'No se pudo eliminar la sesion')
     }
@@ -48,18 +61,38 @@ export default function SessionList() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>Sesiones de entrenamiento</h1>
+        <h1>Historial de entrenamientos</h1>
         <Link className="btn-primary" to="/sesiones/nueva">
           + Nueva sesion
         </Link>
       </div>
+
+      <form className="filter-bar" onSubmit={handleFiltrar}>
+        <label htmlFor="inicio">Desde</label>
+        <input
+          id="inicio"
+          type="date"
+          value={inicio}
+          onChange={(e) => setInicio(e.target.value)}
+        />
+        <label htmlFor="fin">Hasta</label>
+        <input id="fin" type="date" value={fin} onChange={(e) => setFin(e.target.value)} />
+        <button type="submit" className="btn-primary">
+          Filtrar
+        </button>
+        {(inicio || fin) && (
+          <button type="button" onClick={handleLimpiarFiltro}>
+            Limpiar
+          </button>
+        )}
+      </form>
 
       {error && <p className="auth-error">{error}</p>}
 
       {cargando ? (
         <p>Cargando...</p>
       ) : sesiones.length === 0 ? (
-        <p>Aun no has registrado sesiones de entrenamiento.</p>
+        <p>No hay sesiones registradas para el periodo seleccionado.</p>
       ) : (
         <table className="data-table">
           <thead>
@@ -77,6 +110,7 @@ export default function SessionList() {
                 <td>{sesion.ejercicios.map((e) => e.nombreEjercicio).join(', ')}</td>
                 <td>{sesion.notas}</td>
                 <td className="table-actions">
+                  <Link to={`/sesiones/${sesion.id}`}>Ver detalle</Link>
                   <Link to={`/sesiones/${sesion.id}/editar`}>Editar</Link>
                   <button onClick={() => handleEliminar(sesion.id)}>Eliminar</button>
                 </td>

@@ -1,7 +1,9 @@
 import axiosClient from './axiosClient'
 
-export function listarSesiones() {
-  return axiosClient.get('/sesiones').then((res) => res.data)
+export function listarSesiones({ inicio, fin } = {}) {
+  return axiosClient
+    .get('/sesiones', { params: { inicio, fin } })
+    .then((res) => res.data)
 }
 
 export function obtenerSesion(id) {

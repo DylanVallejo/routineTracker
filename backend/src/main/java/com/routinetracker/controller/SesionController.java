@@ -5,10 +5,12 @@ import com.routinetracker.dto.SesionResponse;
 import com.routinetracker.service.SesionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -24,8 +26,10 @@ public class SesionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<SesionResponse>> listar() {
-        return ResponseEntity.ok(sesionService.listar());
+    public ResponseEntity<List<SesionResponse>> listar(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin) {
+        return ResponseEntity.ok(sesionService.listar(inicio, fin));
     }
 
     @GetMapping("/{id}")

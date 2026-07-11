@@ -8,6 +8,7 @@ import ExercisesPage from './pages/ExercisesPage'
 import ExerciseFormPage from './pages/ExerciseFormPage'
 import SessionsPage from './pages/SessionsPage'
 import SessionFormPage from './pages/SessionFormPage'
+import SessionDetailPage from './pages/SessionDetailPage'
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/ejercicios/:id/editar" element={<ExerciseFormPage />} />
           <Route path="/sesiones" element={<SessionsPage />} />
           <Route path="/sesiones/nueva" element={<SessionFormPage />} />
+          <Route path="/sesiones/:id" element={<SessionDetailPage />} />
           <Route path="/sesiones/:id/editar" element={<SessionFormPage />} />
         </Route>
       </Routes>

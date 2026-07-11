@@ -17,7 +17,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,9 +62,18 @@ public class SesionService {
         return SesionResponse.from(sesionRepository.save(sesion));
     }
 
-    public List<SesionResponse> listar() {
+    public List<SesionResponse> listar(LocalDate inicio, LocalDate fin) {
         Usuario usuario = authenticatedUserProvider.getUsuarioActual();
-        return sesionRepository.findByUsuarioIdOrderByFechaDesc(usuario.getId()).stream()
+
+        List<Sesion> sesiones;
+        if (inicio != null && fin != null) {
+            sesiones = sesionRepository.findByUsuarioIdAndFechaBetweenOrderByFechaDesc(
+                    usuario.getId(), inicio.atStartOfDay(), fin.atTime(LocalTime.MAX));
+        } else {
+            sesiones = sesionRepository.findByUsuarioIdOrderByFechaDesc(usuario.getId());
+        }
+
+        return sesiones.stream()
                 .map(SesionResponse::from)
                 .collect(Collectors.toList());
     }
