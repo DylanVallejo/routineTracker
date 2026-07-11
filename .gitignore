@@ -1,0 +1,25 @@
+# Backend (Maven / Spring Boot)
+backend/target/
+backend/.mvn/
+*.class
+
+# Frontend (Node / Vite)
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.env
+frontend/*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE / editor
+.vscode/
+.idea/
+*.iml
+.DS_Store
+*.sw?
+
+# Sistema operativo
+Thumbs.db
