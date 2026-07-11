@@ -10,6 +10,7 @@ export default function NavBar() {
       <div className="navbar-links">
         <Link to="/">Inicio</Link>
         <Link to="/ejercicios">Ejercicios</Link>
+        <Link to="/sesiones">Sesiones</Link>
       </div>
       <div className="navbar-user">
         <span>{usuario?.nombre}</span>

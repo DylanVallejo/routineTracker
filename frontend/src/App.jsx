@@ -6,6 +6,8 @@ import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
 import ExercisesPage from './pages/ExercisesPage'
 import ExerciseFormPage from './pages/ExerciseFormPage'
+import SessionsPage from './pages/SessionsPage'
+import SessionFormPage from './pages/SessionFormPage'
 
 export default function App() {
   return (
@@ -18,6 +20,9 @@ export default function App() {
           <Route path="/ejercicios" element={<ExercisesPage />} />
           <Route path="/ejercicios/nuevo" element={<ExerciseFormPage />} />
           <Route path="/ejercicios/:id/editar" element={<ExerciseFormPage />} />
+          <Route path="/sesiones" element={<SessionsPage />} />
+          <Route path="/sesiones/nueva" element={<SessionFormPage />} />
+          <Route path="/sesiones/:id/editar" element={<SessionFormPage />} />
         </Route>
       </Routes>
     </AuthProvider>

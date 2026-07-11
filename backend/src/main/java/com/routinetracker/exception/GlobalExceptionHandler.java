@@ -33,6 +33,21 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(EjercicioEnUsoException.class)
+    public ResponseEntity<Map<String, Object>> handleEjercicioEnUso(EjercicioEnUsoException ex) {
+        return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(FechaFuturaException.class)
+    public ResponseEntity<Map<String, Object>> handleFechaFutura(FechaFuturaException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(SesionNoEncontradaException.class)
+    public ResponseEntity<Map<String, Object>> handleSesionNoEncontrada(SesionNoEncontradaException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidacion(MethodArgumentNotValidException ex) {
         String mensaje = ex.getBindingResult().getFieldErrors().stream()

@@ -16,14 +16,25 @@ export default function ExerciseForm() {
 
   useEffect(() => {
     if (!esEdicion) return
+    let activo = true
+
     obtenerEjercicio(id)
       .then((data) => {
+        if (!activo) return
         setNombre(data.nombre)
         setGrupoMuscular(data.grupoMuscular)
         setDescripcion(data.descripcion || '')
       })
-      .catch(() => setError('No se pudo cargar el ejercicio'))
-      .finally(() => setCargando(false))
+      .catch(() => {
+        if (activo) setError('No se pudo cargar el ejercicio')
+      })
+      .finally(() => {
+        if (activo) setCargando(false)
+      })
+
+    return () => {
+      activo = false
+    }
   }, [id, esEdicion])
 
   async function handleSubmit(event) {

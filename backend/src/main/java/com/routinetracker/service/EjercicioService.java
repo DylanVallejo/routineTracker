@@ -4,8 +4,10 @@ import com.routinetracker.dto.EjercicioRequest;
 import com.routinetracker.dto.EjercicioResponse;
 import com.routinetracker.entity.Ejercicio;
 import com.routinetracker.exception.EjercicioDuplicadoException;
+import com.routinetracker.exception.EjercicioEnUsoException;
 import com.routinetracker.exception.EjercicioNoEncontradoException;
 import com.routinetracker.repository.EjercicioRepository;
+import com.routinetracker.repository.SesionEjercicioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class EjercicioService {
 
     private final EjercicioRepository ejercicioRepository;
+    private final SesionEjercicioRepository sesionEjercicioRepository;
 
     @Transactional
     public EjercicioResponse crear(EjercicioRequest request) {
@@ -63,6 +66,9 @@ public class EjercicioService {
     public void eliminar(Long id) {
         if (!ejercicioRepository.existsById(id)) {
             throw new EjercicioNoEncontradoException(id);
+        }
+        if (sesionEjercicioRepository.existsByEjercicioId(id)) {
+            throw new EjercicioEnUsoException(id);
         }
         ejercicioRepository.deleteById(id);
     }

@@ -230,3 +230,52 @@ body {
     overflow-x: auto;
   }
 }
+
+.session-form {
+  max-width: 640px;
+}
+
+.session-form h2 {
+  font-size: 1.1rem;
+  margin: 0.5rem 0 0;
+}
+
+.session-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.session-row select,
+.session-row input {
+  padding: 0.5rem;
+  border: 1px solid #cbd2d9;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  width: 100%;
+}
+
+.session-row button {
+  border: none;
+  background: none;
+  color: #b91c1c;
+  cursor: pointer;
+  padding: 0.3rem;
+}
+
+.btn-secondary {
+  padding: 0.5rem;
+  border: 1px dashed #2563eb;
+  border-radius: 6px;
+  background: none;
+  color: #2563eb;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+@media (max-width: 640px) {
+  .session-row {
+    grid-template-columns: 1fr;
+  }
+}
