@@ -19,6 +19,30 @@ const AZUL = '#2563eb'
 const VERDE = '#22c55e'
 const ROJO = '#ef4444'
 
+const ZONAS_REPETICIONES = [
+  { nombre: 'Hipertrofia (6-12 reps)', min: 6, max: 12, color: 'rgba(234, 179, 8, 0.14)', swatch: '#eab308' },
+  { nombre: 'Resistencia (13-20 reps)', min: 13, max: 20, color: 'rgba(20, 184, 166, 0.14)', swatch: '#14b8a6' },
+]
+
+function bandasPlugin(zonas) {
+  return {
+    id: 'bandasEntrenamiento',
+    beforeDraw(chart) {
+      const { ctx, chartArea, scales } = chart
+      if (!chartArea) return
+      const y = scales.y
+      zonas.forEach(({ min, max, color }) => {
+        const yTop = y.getPixelForValue(max)
+        const yBottom = y.getPixelForValue(min)
+        ctx.save()
+        ctx.fillStyle = color
+        ctx.fillRect(chartArea.left, yTop, chartArea.right - chartArea.left, yBottom - yTop)
+        ctx.restore()
+      })
+    },
+  }
+}
+
 function formatearFechaCorta(fechaIso) {
   const fecha = new Date(fechaIso)
   return fecha.toLocaleDateString('es-EC', { day: '2-digit', month: '2-digit', year: '2-digit' })
@@ -145,8 +169,23 @@ export default function ProgressChart() {
             {metrica === 'peso' ? 'kg' : 'repeticiones'} ({formatearFechaCorta(puntos[indiceMin].fecha)})
           </p>
 
+          {metrica === 'repeticiones' && (
+            <div className="zonas-leyenda">
+              {ZONAS_REPETICIONES.map((zona) => (
+                <span key={zona.nombre}>
+                  <span className="swatch" style={{ backgroundColor: zona.swatch }} />
+                  {zona.nombre}
+                </span>
+              ))}
+            </div>
+          )}
+
           <div className="chart-container">
-            <Line data={chartData} options={chartOptions} />
+            <Line
+              data={chartData}
+              options={chartOptions}
+              plugins={metrica === 'repeticiones' ? [bandasPlugin(ZONAS_REPETICIONES)] : []}
+            />
           </div>
         </>
       )}

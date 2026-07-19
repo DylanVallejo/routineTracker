@@ -126,6 +126,10 @@ export default function SessionForm() {
         <textarea id="notas" value={notas} onChange={(e) => setNotas(e.target.value)} rows={2} />
 
         <h2>Ejercicios</h2>
+        <p className="rango-referencia">
+          Rango habitual: <strong>hipertrofia</strong> 3-5 series x 6-12 repeticiones ·{' '}
+          <strong>resistencia</strong> 2-4 series x 13-20 repeticiones
+        </p>
         {ejerciciosDisponibles.length === 0 ? (
           <p>
             No tienes ejercicios registrados. Crea uno primero en la seccion Ejercicios.
@@ -148,6 +152,7 @@ export default function SessionForm() {
               <input
                 type="number"
                 min="1"
+                max="6"
                 placeholder="Series"
                 value={fila.series}
                 onChange={(e) => actualizarFila(indice, 'series', e.target.value)}
@@ -156,6 +161,7 @@ export default function SessionForm() {
               <input
                 type="number"
                 min="1"
+                max="20"
                 placeholder="Repeticiones"
                 value={fila.repeticiones}
                 onChange={(e) => actualizarFila(indice, 'repeticiones', e.target.value)}

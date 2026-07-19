@@ -359,3 +359,31 @@ body {
   color: #52606d;
   font-size: 0.9rem;
 }
+
+.rango-referencia {
+  margin: -0.5rem 0 0.75rem;
+  color: #52606d;
+  font-size: 0.85rem;
+}
+
+.zonas-leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  color: #52606d;
+}
+
+.zonas-leyenda span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.zonas-leyenda .swatch {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 2px;
+}
