@@ -7,6 +7,7 @@ export default function RegisterForm() {
   const [nombre, setNombre] = useState('')
   const [correo, setCorreo] = useState('')
   const [password, setPassword] = useState('')
+  const [mostrarPassword, setMostrarPassword] = useState(false)
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(false)
   const { login } = useAuth()
@@ -56,13 +57,23 @@ export default function RegisterForm() {
       />
 
       <label htmlFor="password">Contrasena</label>
-      <input
-        id="password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
+      <div className="password-field">
+        <input
+          id="password"
+          type={mostrarPassword ? 'text' : 'password'}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <button
+          type="button"
+          className="password-toggle"
+          onClick={() => setMostrarPassword((valor) => !valor)}
+          aria-label={mostrarPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+        >
+          {mostrarPassword ? 'Ocultar' : 'Mostrar'}
+        </button>
+      </div>
 
       {error && <p className="auth-error">{error}</p>}
 

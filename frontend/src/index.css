@@ -60,6 +60,33 @@ body {
   cursor: pointer;
 }
 
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-field input {
+  width: 100%;
+  padding-right: 4.75rem;
+}
+
+.auth-form .password-toggle {
+  position: absolute;
+  right: 0.4rem;
+  margin-top: 0;
+  padding: 0.35rem 0.6rem;
+  background-color: transparent;
+  color: #2563eb;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+.auth-form .password-toggle:hover {
+  background-color: #eff6ff;
+}
+
 .auth-form button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
