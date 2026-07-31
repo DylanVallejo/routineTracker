@@ -15,8 +15,8 @@ import { PERIODOS, calcularRangoPeriodo } from '../constants/periodos'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
-const VERDE = '#22c55e'
-const ROJO = '#ef4444'
+const EXITO = '#409d48'
+const ALERTA = '#c53637'
 
 export default function MuscleAnalysis() {
   const [periodo, setPeriodo] = useState('30')
@@ -53,8 +53,8 @@ export default function MuscleAnalysis() {
       {
         label: 'Veces entrenado',
         data: frecuencias,
-        backgroundColor: datos.map((d) => (d.frecuencia === minimo ? ROJO : VERDE)),
-        borderRadius: 4,
+        backgroundColor: datos.map((d) => (d.frecuencia === minimo ? ALERTA : EXITO)),
+        borderRadius: 2,
       },
     ],
   }

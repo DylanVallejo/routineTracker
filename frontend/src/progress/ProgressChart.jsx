@@ -15,13 +15,13 @@ import { obtenerProgreso } from '../api/progresoService'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
-const AZUL = '#2563eb'
-const VERDE = '#22c55e'
-const ROJO = '#ef4444'
+const ACENTO = '#d33b36'
+const EXITO = '#409d48'
+const ALERTA = '#c53637'
 
 const ZONAS_REPETICIONES = [
-  { nombre: 'Hipertrofia (6-12 reps)', min: 6, max: 12, color: 'rgba(234, 179, 8, 0.14)', swatch: '#eab308' },
-  { nombre: 'Resistencia (13-20 reps)', min: 13, max: 20, color: 'rgba(20, 184, 166, 0.14)', swatch: '#14b8a6' },
+  { nombre: 'Hipertrofia (6-12 reps)', min: 6, max: 12, color: 'rgba(217, 165, 20, 0.14)', swatch: '#d9a514' },
+  { nombre: 'Resistencia (13-20 reps)', min: 13, max: 20, color: 'rgba(22, 132, 133, 0.14)', swatch: '#168485' },
 ]
 
 function bandasPlugin(zonas) {
@@ -100,10 +100,10 @@ export default function ProgressChart() {
       {
         label: metrica === 'peso' ? 'Peso (kg)' : 'Repeticiones',
         data: valores,
-        borderColor: AZUL,
-        backgroundColor: AZUL,
+        borderColor: ACENTO,
+        backgroundColor: ACENTO,
         pointBackgroundColor: valores.map((_, i) =>
-          i === indiceMax ? VERDE : i === indiceMin ? ROJO : AZUL
+          i === indiceMax ? EXITO : i === indiceMin ? ALERTA : ACENTO
         ),
         pointRadius: valores.map((_, i) => (i === indiceMax || i === indiceMin ? 7 : 4)),
         tension: 0.2,

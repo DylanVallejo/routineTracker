@@ -1,0 +1,10 @@
+[
+  {
+    "date": "2026-07-29",
+    "scope": "app",
+    "macrostructure": "App shell (navbar + page-container)",
+    "theme": "Sport",
+    "enrichment": "none",
+    "brief": "Routine Tracker · redisenio visual completo de la app (login, dashboard, ejercicios, sesiones, analisis, progreso) sobre design.md"
+  }
+]
