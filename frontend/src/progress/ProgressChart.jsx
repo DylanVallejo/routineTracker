@@ -12,6 +12,7 @@ import {
 import { Line } from 'react-chartjs-2'
 import { listarEjercicios } from '../api/ejercicioService'
 import { obtenerProgreso } from '../api/progresoService'
+import { bandasPlugin } from '../charts/bandasPlugin'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
@@ -23,25 +24,6 @@ const ZONAS_REPETICIONES = [
   { nombre: 'Hipertrofia (6-12 reps)', min: 6, max: 12, color: 'rgba(217, 165, 20, 0.14)', swatch: '#d9a514' },
   { nombre: 'Resistencia (13-20 reps)', min: 13, max: 20, color: 'rgba(22, 132, 133, 0.14)', swatch: '#168485' },
 ]
-
-function bandasPlugin(zonas) {
-  return {
-    id: 'bandasEntrenamiento',
-    beforeDraw(chart) {
-      const { ctx, chartArea, scales } = chart
-      if (!chartArea) return
-      const y = scales.y
-      zonas.forEach(({ min, max, color }) => {
-        const yTop = y.getPixelForValue(max)
-        const yBottom = y.getPixelForValue(min)
-        ctx.save()
-        ctx.fillStyle = color
-        ctx.fillRect(chartArea.left, yTop, chartArea.right - chartArea.left, yBottom - yTop)
-        ctx.restore()
-      })
-    },
-  }
-}
 
 function formatearFechaCorta(fechaIso) {
   const fecha = new Date(fechaIso)

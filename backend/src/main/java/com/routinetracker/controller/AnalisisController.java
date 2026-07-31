@@ -1,6 +1,7 @@
 package com.routinetracker.controller;
 
 import com.routinetracker.dto.AnalisisMuscularResponse;
+import com.routinetracker.dto.AnalisisVolumenResponse;
 import com.routinetracker.service.AnalisisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -23,5 +24,12 @@ public class AnalisisController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin) {
         return ResponseEntity.ok(analisisService.analizarPorGrupoMuscular(inicio, fin));
+    }
+
+    @GetMapping("/api/analisis/volumen")
+    public ResponseEntity<List<AnalisisVolumenResponse>> analizarVolumen(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin) {
+        return ResponseEntity.ok(analisisService.analizarVolumenPorGrupoMuscular(inicio, fin));
     }
 }

@@ -9,9 +9,11 @@ import {
   Legend,
 } from 'chart.js'
 import { Bar } from 'react-chartjs-2'
-import { obtenerAnalisisMuscular } from '../api/analisisService'
-import { etiquetaGrupoMuscular } from '../constants/gruposMusculares'
+import { obtenerAnalisisMuscular, obtenerAnalisisVolumen } from '../api/analisisService'
+import { GRUPOS_MUSCULARES, etiquetaGrupoMuscular } from '../constants/gruposMusculares'
 import { PERIODOS, calcularRangoPeriodo } from '../constants/periodos'
+import { ZONAS_VOLUMEN, TOPE_GRAFICO, clasificarVolumen } from '../constants/zonasVolumen'
+import { bandasPlugin } from '../charts/bandasPlugin'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
@@ -20,40 +22,55 @@ const ALERTA = '#c53637'
 
 export default function MuscleAnalysis() {
   const [periodo, setPeriodo] = useState('30')
+  const [grupoMuscular, setGrupoMuscular] = useState('TODOS')
   const [datos, setDatos] = useState([])
+  const [datosVolumen, setDatosVolumen] = useState([])
+  const [mostrarInfoVolumen, setMostrarInfoVolumen] = useState(false)
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(true)
 
-  async function cargar(valorPeriodo) {
-    setCargando(true)
-    setError('')
-    try {
-      const rango = calcularRangoPeriodo(valorPeriodo)
-      const resultado = await obtenerAnalisisMuscular(rango)
-      setDatos(resultado)
-    } catch (err) {
-      setError(err.response?.data?.mensaje || 'No se pudo cargar el analisis muscular')
-    } finally {
-      setCargando(false)
-    }
-  }
-
   useEffect(() => {
-    cargar(periodo)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    let activo = true
+
+    async function cargar() {
+      setCargando(true)
+      setError('')
+      try {
+        const rango = calcularRangoPeriodo(periodo)
+        const [resultado, resultadoVolumen] = await Promise.all([
+          obtenerAnalisisMuscular(rango),
+          obtenerAnalisisVolumen(rango),
+        ])
+        if (!activo) return
+        setDatos(resultado)
+        setDatosVolumen(resultadoVolumen)
+      } catch (err) {
+        if (activo) setError(err.response?.data?.mensaje || 'No se pudo cargar el analisis muscular')
+      } finally {
+        if (activo) setCargando(false)
+      }
+    }
+
+    cargar()
+    return () => {
+      activo = false
+    }
   }, [periodo])
 
-  const frecuencias = datos.map((d) => d.frecuencia)
+  const datosFiltrados =
+    grupoMuscular === 'TODOS' ? datos : datos.filter((d) => d.grupoMuscular === grupoMuscular)
+
+  const frecuencias = datosFiltrados.map((d) => d.frecuencia)
   const minimo = frecuencias.length > 0 ? Math.min(...frecuencias) : 0
-  const grupoMenosTrabajado = datos.find((d) => d.frecuencia === minimo)
+  const grupoMenosTrabajado = datosFiltrados.find((d) => d.frecuencia === minimo)
 
   const chartData = {
-    labels: datos.map((d) => etiquetaGrupoMuscular(d.grupoMuscular)),
+    labels: datosFiltrados.map((d) => etiquetaGrupoMuscular(d.grupoMuscular)),
     datasets: [
       {
         label: 'Veces entrenado',
         data: frecuencias,
-        backgroundColor: datos.map((d) => (d.frecuencia === minimo ? ALERTA : EXITO)),
+        backgroundColor: datosFiltrados.map((d) => (d.frecuencia === minimo ? ALERTA : EXITO)),
         borderRadius: 2,
       },
     ],
@@ -74,6 +91,43 @@ export default function MuscleAnalysis() {
     },
   }
 
+  const volumenFiltrado =
+    grupoMuscular === 'TODOS'
+      ? datosVolumen
+      : datosVolumen.filter((d) => d.grupoMuscular === grupoMuscular)
+
+  const volumenChartData = {
+    labels: volumenFiltrado.map((d) => etiquetaGrupoMuscular(d.grupoMuscular)),
+    datasets: [
+      {
+        label: 'Sets por semana',
+        data: volumenFiltrado.map((d) => d.setsPorSemana),
+        backgroundColor: '#3a6ea5',
+        borderRadius: 2,
+      },
+    ],
+  }
+
+  const volumenChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      title: { display: false },
+      tooltip: {
+        callbacks: {
+          afterLabel: (item) => clasificarVolumen(item.parsed.y),
+        },
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        suggestedMax: TOPE_GRAFICO,
+      },
+    },
+  }
+
   return (
     <div className="page-container">
       <div className="page-header">
@@ -89,6 +143,20 @@ export default function MuscleAnalysis() {
             </option>
           ))}
         </select>
+
+        <label htmlFor="grupoMuscular">Grupo muscular</label>
+        <select
+          id="grupoMuscular"
+          value={grupoMuscular}
+          onChange={(e) => setGrupoMuscular(e.target.value)}
+        >
+          <option value="TODOS">Todos</option>
+          {GRUPOS_MUSCULARES.map((g) => (
+            <option key={g.value} value={g.value}>
+              {g.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       {error && <p className="auth-error">{error}</p>}
@@ -97,7 +165,7 @@ export default function MuscleAnalysis() {
         <p>Cargando...</p>
       ) : (
         <>
-          {grupoMenosTrabajado && (
+          {grupoMuscular === 'TODOS' && grupoMenosTrabajado && (
             <p className="analisis-destacado">
               Grupo muscular menos trabajado:{' '}
               <strong>{etiquetaGrupoMuscular(grupoMenosTrabajado.grupoMuscular)}</strong> (
@@ -106,15 +174,81 @@ export default function MuscleAnalysis() {
             </p>
           )}
 
+          {grupoMuscular !== 'TODOS' && grupoMenosTrabajado && (
+            <p className="analisis-destacado">
+              <strong>{etiquetaGrupoMuscular(grupoMenosTrabajado.grupoMuscular)}</strong>{' '}
+              entrenado {grupoMenosTrabajado.frecuencia}{' '}
+              {grupoMenosTrabajado.frecuencia === 1 ? 'vez' : 'veces'} en este periodo.
+            </p>
+          )}
+
           <div className="chart-container">
             <Bar data={chartData} options={chartOptions} />
           </div>
 
-          {minimo === Math.max(...frecuencias) && (
+          {grupoMuscular === 'TODOS' && frecuencias.length > 1 && minimo === Math.max(...frecuencias) && (
             <p className="analisis-nota">
               Todos los grupos musculares tienen la misma frecuencia en este periodo.
             </p>
           )}
+
+          <div className="page-header analisis-subheader">
+            <h2>Volumen semanal (sets)</h2>
+            <button
+              type="button"
+              className="info-toggle"
+              onClick={() => setMostrarInfoVolumen((valor) => !valor)}
+              aria-expanded={mostrarInfoVolumen}
+              aria-label="Que significa MV, MEV, MAV y MRV"
+            >
+              i
+            </button>
+          </div>
+
+          {mostrarInfoVolumen && (
+            <div className="info-panel">
+              <p>
+                Estas siglas indican cuantas series ("sets") por semana necesita un grupo muscular
+                para crecer, segun la ciencia del entrenamiento de fuerza:
+              </p>
+              <ul>
+                <li>
+                  <strong>MV</strong> (Volumen de mantenimiento): lo minimo para no perder musculo,
+                  sin buscar crecer.
+                </li>
+                <li>
+                  <strong>MEV</strong> (Volumen minimo efectivo): a partir de aqui el musculo
+                  empieza a crecer.
+                </li>
+                <li>
+                  <strong>MAV</strong> (Volumen adaptativo maximo): el rango donde mas crece la
+                  mayoria de personas.
+                </li>
+                <li>
+                  <strong>MRV</strong> (Volumen maximo recuperable): el limite antes de que el
+                  cuerpo ya no pueda recuperarse a tiempo entre entrenamientos.
+                </li>
+              </ul>
+              <p>
+                Son valores generales de referencia (no personalizados a tu experiencia o
+                genetica), pensados para orientar cuantas series por semana conviene sumar por
+                grupo muscular.
+              </p>
+            </div>
+          )}
+
+          <div className="zonas-leyenda">
+            {ZONAS_VOLUMEN.map((zona) => (
+              <span key={zona.nombre}>
+                <span className="swatch" style={{ backgroundColor: zona.swatch }} />
+                {zona.nombre}
+              </span>
+            ))}
+          </div>
+
+          <div className="chart-container">
+            <Bar data={volumenChartData} options={volumenChartOptions} plugins={[bandasPlugin(ZONAS_VOLUMEN)]} />
+          </div>
         </>
       )}
     </div>
