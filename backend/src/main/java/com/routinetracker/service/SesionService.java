@@ -43,7 +43,7 @@ public class SesionService {
                 .notas(request.getNotas())
                 .build();
 
-        request.getEjercicios().forEach(er -> sesion.agregarEjercicio(construirSesionEjercicio(er)));
+        request.getEjercicios().forEach(er -> sesion.agregarEjercicio(construirSesionEjercicio(er, usuario.getId())));
 
         return SesionResponse.from(sesionRepository.save(sesion));
     }
@@ -52,12 +52,13 @@ public class SesionService {
     public SesionResponse actualizar(Long id, SesionRequest request) {
         validarFecha(request.getFecha());
 
+        Usuario usuario = authenticatedUserProvider.getUsuarioActual();
         Sesion sesion = obtenerDeUsuarioActual(id);
         sesion.setFecha(request.getFecha());
         sesion.setNotas(request.getNotas());
 
         sesion.getEjercicios().clear();
-        request.getEjercicios().forEach(er -> sesion.agregarEjercicio(construirSesionEjercicio(er)));
+        request.getEjercicios().forEach(er -> sesion.agregarEjercicio(construirSesionEjercicio(er, usuario.getId())));
 
         return SesionResponse.from(sesionRepository.save(sesion));
     }
@@ -100,8 +101,8 @@ public class SesionService {
         return sesion;
     }
 
-    private SesionEjercicio construirSesionEjercicio(SesionEjercicioRequest request) {
-        Ejercicio ejercicio = ejercicioRepository.findById(request.getEjercicioId())
+    private SesionEjercicio construirSesionEjercicio(SesionEjercicioRequest request, Long usuarioId) {
+        Ejercicio ejercicio = ejercicioRepository.findByIdAndUsuarioId(request.getEjercicioId(), usuarioId)
                 .orElseThrow(() -> new EjercicioNoEncontradoException(request.getEjercicioId()));
 
         return SesionEjercicio.builder()

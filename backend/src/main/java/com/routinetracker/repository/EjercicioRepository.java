@@ -5,11 +5,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface EjercicioRepository extends JpaRepository<Ejercicio, Long> {
 
-    boolean existsByNombreIgnoreCase(String nombre);
+    boolean existsByNombreIgnoreCaseAndUsuarioId(String nombre, Long usuarioId);
 
-    boolean existsByNombreIgnoreCaseAndIdNot(String nombre, Long id);
+    boolean existsByNombreIgnoreCaseAndIdNotAndUsuarioId(String nombre, Long id, Long usuarioId);
 
-    Page<Ejercicio> findAll(Pageable pageable);
+    Page<Ejercicio> findByUsuarioId(Long usuarioId, Pageable pageable);
+
+    Optional<Ejercicio> findByIdAndUsuarioId(Long id, Long usuarioId);
 }

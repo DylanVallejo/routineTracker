@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "ejercicio")
+@Table(name = "ejercicio", uniqueConstraints = @UniqueConstraint(name = "uk_ejercicio_usuario_nombre", columnNames = {"usuario_id", "nombre"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,7 +18,11 @@ public class Ejercicio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
+
+    @Column(nullable = false, length = 100)
     private String nombre;
 
     @Enumerated(EnumType.STRING)
