@@ -23,6 +23,21 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
+    @ExceptionHandler(CuentaNoVerificadaException.class)
+    public ResponseEntity<Map<String, Object>> handleCuentaNoVerificada(CuentaNoVerificadaException ex) {
+        return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
+    @ExceptionHandler(TokenInvalidoException.class)
+    public ResponseEntity<Map<String, Object>> handleTokenInvalido(TokenInvalidoException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(DemasiadosIntentosException.class)
+    public ResponseEntity<Map<String, Object>> handleDemasiadosIntentos(DemasiadosIntentosException ex) {
+        return buildResponse(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
+    }
+
     @ExceptionHandler(EjercicioDuplicadoException.class)
     public ResponseEntity<Map<String, Object>> handleEjercicioDuplicado(EjercicioDuplicadoException ex) {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage());

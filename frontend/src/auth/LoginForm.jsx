@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { iniciarSesion } from '../api/authService'
+import { iniciarSesion, reenviarVerificacion } from '../api/authService'
 import { useAuth } from './AuthContext'
 
 export default function LoginForm() {
@@ -8,6 +8,8 @@ export default function LoginForm() {
   const [password, setPassword] = useState('')
   const [mostrarPassword, setMostrarPassword] = useState(false)
   const [error, setError] = useState('')
+  const [noVerificado, setNoVerificado] = useState(false)
+  const [avisoReenvio, setAvisoReenvio] = useState('')
   const [cargando, setCargando] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -15,6 +17,8 @@ export default function LoginForm() {
   async function handleSubmit(event) {
     event.preventDefault()
     setError('')
+    setNoVerificado(false)
+    setAvisoReenvio('')
     setCargando(true)
     try {
       const data = await iniciarSesion({ correo, password })
@@ -22,8 +26,19 @@ export default function LoginForm() {
       navigate('/')
     } catch (err) {
       setError(err.response?.data?.mensaje || 'Correo o contrasena invalidos')
+      setNoVerificado(err.response?.status === 403)
     } finally {
       setCargando(false)
+    }
+  }
+
+  async function handleReenviar() {
+    setAvisoReenvio('')
+    try {
+      const data = await reenviarVerificacion(correo)
+      setAvisoReenvio(data.mensaje)
+    } catch {
+      setAvisoReenvio('No se pudo reenviar el correo, intenta mas tarde')
     }
   }
 
@@ -60,11 +75,20 @@ export default function LoginForm() {
       </div>
 
       {error && <p className="auth-error">{error}</p>}
+      {noVerificado && (
+        <button type="button" className="auth-link-button" onClick={handleReenviar}>
+          Reenviar correo de confirmacion
+        </button>
+      )}
+      {avisoReenvio && <p className="auth-info">{avisoReenvio}</p>}
 
       <button type="submit" disabled={cargando}>
         {cargando ? 'Ingresando...' : 'Ingresar'}
       </button>
 
+      <p className="auth-switch">
+        <Link to="/recuperar">¿Olvidaste tu contrasena?</Link>
+      </p>
       <p className="auth-switch">
         ¿No tienes cuenta? <Link to="/register">Registrate</Link>
       </p>

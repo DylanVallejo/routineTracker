@@ -1,46 +1,52 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { registrarUsuario } from '../api/authService'
+import { Link, useSearchParams } from 'react-router-dom'
+import { restablecerPassword } from '../api/authService'
 
-export default function RegisterForm() {
-  const [nombre, setNombre] = useState('')
-  const [correo, setCorreo] = useState('')
+export default function ResetPasswordForm() {
+  const [searchParams] = useSearchParams()
+  const token = searchParams.get('token') || ''
   const [password, setPassword] = useState('')
+  const [confirmar, setConfirmar] = useState('')
   const [mostrarPassword, setMostrarPassword] = useState(false)
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(false)
-  const [registrado, setRegistrado] = useState(false)
+  const [listo, setListo] = useState(false)
 
   async function handleSubmit(event) {
     event.preventDefault()
     setError('')
 
+    if (!token) {
+      setError('El enlace no es valido')
+      return
+    }
     if (password.length < 6) {
       setError('La contrasena debe tener al menos 6 caracteres')
+      return
+    }
+    if (password !== confirmar) {
+      setError('Las contrasenas no coinciden')
       return
     }
 
     setCargando(true)
     try {
-      await registrarUsuario({ nombre, correo, password })
-      setRegistrado(true)
+      await restablecerPassword({ token, password })
+      setListo(true)
     } catch (err) {
-      setError(err.response?.data?.mensaje || 'No se pudo completar el registro')
+      setError(err.response?.data?.mensaje || 'No se pudo actualizar la contrasena')
     } finally {
       setCargando(false)
     }
   }
 
-  if (registrado) {
+  if (listo) {
     return (
       <div className="auth-form">
-        <h1>Revisa tu correo</h1>
-        <p className="auth-info">
-          Te enviamos un enlace a <strong>{correo}</strong> para confirmar tu cuenta.
-          Abrilo para activarla y poder iniciar sesion.
-        </p>
+        <h1>Contrasena actualizada</h1>
+        <p className="auth-info">Ya puedes iniciar sesion con tu nueva contrasena.</p>
         <p className="auth-switch">
-          <Link to="/login">Volver a iniciar sesion</Link>
+          <Link to="/login">Ir a iniciar sesion</Link>
         </p>
       </div>
     )
@@ -48,27 +54,9 @@ export default function RegisterForm() {
 
   return (
     <form className="auth-form" onSubmit={handleSubmit}>
-      <h1>Crear cuenta</h1>
+      <h1>Nueva contrasena</h1>
 
-      <label htmlFor="nombre">Nombre</label>
-      <input
-        id="nombre"
-        type="text"
-        value={nombre}
-        onChange={(e) => setNombre(e.target.value)}
-        required
-      />
-
-      <label htmlFor="correo">Correo</label>
-      <input
-        id="correo"
-        type="email"
-        value={correo}
-        onChange={(e) => setCorreo(e.target.value)}
-        required
-      />
-
-      <label htmlFor="password">Contrasena</label>
+      <label htmlFor="password">Nueva contrasena</label>
       <div className="password-field">
         <input
           id="password"
@@ -87,14 +75,23 @@ export default function RegisterForm() {
         </button>
       </div>
 
+      <label htmlFor="confirmar">Confirmar contrasena</label>
+      <input
+        id="confirmar"
+        type={mostrarPassword ? 'text' : 'password'}
+        value={confirmar}
+        onChange={(e) => setConfirmar(e.target.value)}
+        required
+      />
+
       {error && <p className="auth-error">{error}</p>}
 
       <button type="submit" disabled={cargando}>
-        {cargando ? 'Creando cuenta...' : 'Registrarme'}
+        {cargando ? 'Guardando...' : 'Guardar contrasena'}
       </button>
 
       <p className="auth-switch">
-        ¿Ya tienes cuenta? <Link to="/login">Inicia sesion</Link>
+        <Link to="/login">Volver a iniciar sesion</Link>
       </p>
     </form>
   )

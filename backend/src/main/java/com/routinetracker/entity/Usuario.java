@@ -29,6 +29,9 @@ public class Usuario {
     @Column(name = "password_hash", nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private boolean verificado;
+
     @Column(name = "fecha_creacion", nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
 

@@ -5,6 +5,7 @@ import com.routinetracker.dto.LoginRequest;
 import com.routinetracker.dto.RegisterRequest;
 import com.routinetracker.entity.Usuario;
 import com.routinetracker.exception.CredencialesInvalidasException;
+import com.routinetracker.exception.CuentaNoVerificadaException;
 import com.routinetracker.exception.EmailYaRegistradoException;
 import com.routinetracker.repository.UsuarioRepository;
 import com.routinetracker.security.JwtService;
@@ -24,8 +25,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final CuentaService cuentaService;
 
-    public AuthResponse register(RegisterRequest request) {
+    public void register(RegisterRequest request) {
         if (usuarioRepository.existsByCorreo(request.getCorreo())) {
             throw new EmailYaRegistradoException(request.getCorreo());
         }
@@ -34,12 +36,11 @@ public class AuthService {
                 .nombre(request.getNombre())
                 .correo(request.getCorreo())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .verificado(false)
                 .build();
 
         usuarioRepository.save(usuario);
-
-        String token = jwtService.generateToken(new User(usuario.getCorreo(), usuario.getPassword(), java.util.Collections.emptyList()));
-        return new AuthResponse(token, usuario.getNombre(), usuario.getCorreo());
+        cuentaService.enviarVerificacion(usuario);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -53,6 +54,10 @@ public class AuthService {
 
         Usuario usuario = usuarioRepository.findByCorreo(request.getCorreo())
                 .orElseThrow(CredencialesInvalidasException::new);
+
+        if (!usuario.isVerificado()) {
+            throw new CuentaNoVerificadaException();
+        }
 
         String token = jwtService.generateToken(new User(usuario.getCorreo(), usuario.getPassword(), java.util.Collections.emptyList()));
         return new AuthResponse(token, usuario.getNombre(), usuario.getCorreo());
