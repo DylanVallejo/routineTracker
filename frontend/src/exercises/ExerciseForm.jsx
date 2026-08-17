@@ -11,6 +11,7 @@ export default function ExerciseForm() {
   const [nombre, setNombre] = useState('')
   const [grupoMuscular, setGrupoMuscular] = useState(GRUPOS_MUSCULARES[0].value)
   const [descripcion, setDescripcion] = useState('')
+  const [videoUrl, setVideoUrl] = useState('')
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(esEdicion)
 
@@ -24,6 +25,7 @@ export default function ExerciseForm() {
         setNombre(data.nombre)
         setGrupoMuscular(data.grupoMuscular)
         setDescripcion(data.descripcion || '')
+        setVideoUrl(data.videoUrl || '')
       })
       .catch(() => {
         if (activo) setError('No se pudo cargar el ejercicio')
@@ -41,7 +43,7 @@ export default function ExerciseForm() {
     event.preventDefault()
     setError('')
 
-    const datos = { nombre, grupoMuscular, descripcion }
+    const datos = { nombre, grupoMuscular, descripcion, videoUrl }
 
     try {
       if (esEdicion) {
@@ -90,6 +92,15 @@ export default function ExerciseForm() {
           value={descripcion}
           onChange={(e) => setDescripcion(e.target.value)}
           rows={3}
+        />
+
+        <label htmlFor="videoUrl">Video demostrativo (opcional)</label>
+        <input
+          id="videoUrl"
+          type="url"
+          placeholder="https://www.youtube.com/watch?v=..."
+          value={videoUrl}
+          onChange={(e) => setVideoUrl(e.target.value)}
         />
 
         {error && <p className="auth-error">{error}</p>}

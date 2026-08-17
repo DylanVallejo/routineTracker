@@ -21,3 +21,11 @@ export function actualizarEjercicio(id, datos) {
 export function eliminarEjercicio(id) {
   return axiosClient.delete(`/ejercicios/${id}`)
 }
+
+export function listarCatalogoEjercicios() {
+  return axiosClient.get('/ejercicios/catalogo').then((res) => res.data)
+}
+
+export function agregarEjercicioDesdeCatalogo(id) {
+  return axiosClient.post(`/ejercicios/catalogo/${id}/agregar`).then((res) => res.data)
+}

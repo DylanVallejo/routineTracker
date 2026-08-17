@@ -8,6 +8,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage'
 import VerifyEmailPage from './pages/VerifyEmailPage'
 import DashboardPage from './pages/DashboardPage'
 import ExercisesPage from './pages/ExercisesPage'
+import ExerciseCatalogPage from './pages/ExerciseCatalogPage'
 import ExerciseFormPage from './pages/ExerciseFormPage'
 import SessionsPage from './pages/SessionsPage'
 import SessionFormPage from './pages/SessionFormPage'
@@ -27,6 +28,7 @@ export default function App() {
         <Route element={<ProtectedLayout />}>
           <Route path="/" element={<DashboardPage />} />
           <Route path="/ejercicios" element={<ExercisesPage />} />
+          <Route path="/ejercicios/catalogo" element={<ExerciseCatalogPage />} />
           <Route path="/ejercicios/nuevo" element={<ExerciseFormPage />} />
           <Route path="/ejercicios/:id/editar" element={<ExerciseFormPage />} />
           <Route path="/sesiones" element={<SessionsPage />} />

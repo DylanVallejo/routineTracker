@@ -1,5 +1,6 @@
 package com.routinetracker.controller;
 
+import com.routinetracker.dto.EjercicioDefaultResponse;
 import com.routinetracker.dto.EjercicioRequest;
 import com.routinetracker.dto.EjercicioResponse;
 import com.routinetracker.service.EjercicioService;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/ejercicios")
 @RequiredArgsConstructor
@@ -22,6 +25,16 @@ public class EjercicioController {
     @PostMapping
     public ResponseEntity<EjercicioResponse> crear(@Valid @RequestBody EjercicioRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(ejercicioService.crear(request));
+    }
+
+    @GetMapping("/catalogo")
+    public ResponseEntity<List<EjercicioDefaultResponse>> catalogo() {
+        return ResponseEntity.ok(ejercicioService.listarCatalogo());
+    }
+
+    @PostMapping("/catalogo/{id}/agregar")
+    public ResponseEntity<EjercicioResponse> agregarDesdeCatalogo(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ejercicioService.agregarDesdeCatalogo(id));
     }
 
     @GetMapping

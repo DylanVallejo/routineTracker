@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { eliminarEjercicio, listarEjercicios } from '../api/ejercicioService'
 import { etiquetaGrupoMuscular } from '../constants/gruposMusculares'
+import VideoPlayer from '../components/VideoPlayer'
 
 export default function ExerciseList() {
   const [pagina, setPagina] = useState(0)
@@ -41,9 +42,14 @@ export default function ExerciseList() {
     <div className="page-container">
       <div className="page-header">
         <h1>Ejercicios</h1>
-        <Link className="btn-primary" to="/ejercicios/nuevo">
-          + Nuevo ejercicio
-        </Link>
+        <div className="page-header-acciones">
+          <Link className="btn-secondary" to="/ejercicios/catalogo">
+            Ver catalogo
+          </Link>
+          <Link className="btn-primary" to="/ejercicios/nuevo">
+            + Nuevo ejercicio
+          </Link>
+        </div>
       </div>
 
       {error && <p className="auth-error">{error}</p>}
@@ -60,6 +66,7 @@ export default function ExerciseList() {
                 <th>Nombre</th>
                 <th>Grupo muscular</th>
                 <th>Descripcion</th>
+                <th>Video</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -69,6 +76,13 @@ export default function ExerciseList() {
                   <td>{ejercicio.nombre}</td>
                   <td>{etiquetaGrupoMuscular(ejercicio.grupoMuscular)}</td>
                   <td>{ejercicio.descripcion}</td>
+                  <td>
+                    {ejercicio.videoUrl ? (
+                      <VideoPlayer url={ejercicio.videoUrl} titulo={ejercicio.nombre} />
+                    ) : (
+                      '—'
+                    )}
+                  </td>
                   <td className="table-actions">
                     <Link to={`/ejercicios/${ejercicio.id}/editar`}>Editar</Link>
                     <button onClick={() => handleEliminar(ejercicio.id, ejercicio.nombre)}>

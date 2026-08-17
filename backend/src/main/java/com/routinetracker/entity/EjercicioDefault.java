@@ -7,20 +7,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "ejercicio", uniqueConstraints = @UniqueConstraint(name = "uk_ejercicio_usuario_nombre", columnNames = {"usuario_id", "nombre"}))
+@Table(name = "ejercicio_default")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Ejercicio {
+public class EjercicioDefault {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "usuario_id", nullable = false)
-    private Usuario usuario;
 
     @Column(nullable = false, length = 100)
     private String nombre;

@@ -15,4 +15,6 @@ public class EjercicioRequest {
     private GrupoMuscular grupoMuscular;
 
     private String descripcion;
+
+    private String videoUrl;
 }
