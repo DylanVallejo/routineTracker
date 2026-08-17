@@ -57,7 +57,13 @@ export default function ExerciseList() {
       {cargando ? (
         <p>Cargando...</p>
       ) : datos.content.length === 0 ? (
-        <p>Aun no tienes ejercicios registrados.</p>
+        <div className="dashboard-vacio">
+          <p>Aun no tienes ejercicios registrados.</p>
+          <p>Elige ejercicios predefinidos con video demostrativo desde el catalogo, o crea uno propio.</p>
+          <Link className="btn-primary" to="/ejercicios/catalogo">
+            Ver catalogo de ejercicios
+          </Link>
+        </div>
       ) : (
         <>
           <table className="data-table">
