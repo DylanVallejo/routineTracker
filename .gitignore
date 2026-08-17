@@ -1,6 +1,7 @@
 # Backend (Maven / Spring Boot)
 backend/target/
 backend/.mvn/
+backend/application-local.properties
 *.class
 
 # Frontend (Node / Vite)
