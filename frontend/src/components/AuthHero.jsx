@@ -30,13 +30,24 @@ export default function AuthHero() {
 
   return (
     <div className="auth-hero">
-      <h1 className="auth-hero-brand">
-        Routine<span className="auth-hero-brand-accent">Tracker</span>
-      </h1>
-      <p className="auth-hero-tagline">Tu progreso, bajo control.</p>
-      <p className={`auth-hero-frase${visible ? ' is-visible' : ''}`}>
-        {FRASES[indice]}
-      </p>
+      <img
+        src="/animations/man-running.svg"
+        alt=""
+        className="auth-hero-animation"
+      />
+      <div className="auth-hero-content">
+        <h1 className="auth-hero-brand">
+          Routine<span className="auth-hero-brand-accent">Tracker</span>
+        </h1>
+        <div className="auth-hero-lower">
+          <p className="auth-hero-tagline">Tu progreso, bajo control.</p>
+          <div className="auth-hero-frase-wrap">
+            <p className={`auth-hero-frase${visible ? ' is-visible' : ''}`}>
+              {FRASES[indice]}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
