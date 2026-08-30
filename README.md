@@ -126,6 +126,32 @@ npm run dev
 
 Corre en `http://localhost:5173`. La URL de la API se configura en `frontend/.env` (`VITE_API_URL`), ver `frontend/.env.example`.
 
+## Despliegue
+
+```mermaid
+flowchart LR
+    U[Usuario] --> V["Frontend · Vercel"]
+    V -- "HTTP/JSON + JWT" --> R["Backend · Render<br/>(Docker)"]
+    R --> M[("MySQL · Clever Cloud")]
+    R -- "verificación / recuperación" --> G[Gmail SMTP]
+```
+
+- **Frontend**: desplegado en **Vercel** (build de Vite), apuntando a la API mediante la variable `VITE_API_URL`.
+- **Backend**: desplegado en **Render** como Web Service a partir de un `Dockerfile` (`backend/Dockerfile`) — Render no tiene runtime nativo para Java/Maven, por eso se empaqueta en una imagen Docker de dos etapas (build con Maven, ejecución con un JRE liviano). El puerto lo asigna la plataforma en runtime a través de la variable `PORT` (`server.port=${PORT:8080}`), no queda fijo en `8080` como en local.
+- **Base de datos**: MySQL gestionada en **Clever Cloud**. El esquema se crea solo (`ddl-auto=update`) contra la base vacía en el primer arranque, incluyendo el catálogo de ejercicios por defecto.
+
+El backend recibe su configuración de entorno íntegramente por variables (nunca hardcodeada), lo que permite que el mismo código corra igual en local (con los valores por defecto de `application.properties`, todos apuntando a `localhost`) y en producción:
+
+| Variable | Uso |
+|---|---|
+| `DB_URL` | Cadena JDBC completa hacia la MySQL de Clever Cloud |
+| `DB_USERNAME` / `DB_PASSWORD` | Credenciales de esa base |
+| `JWT_SECRET` | Clave de firma de los tokens JWT (distinta a la de ejemplo del repo) |
+| `CORS_ALLOWED_ORIGIN` | Dominio del frontend permitido por CORS (Vercel) |
+| `FRONTEND_URL` | Dominio del frontend usado para armar los enlaces de verificación/recuperación en los correos |
+| `MAIL_ENABLED` / `MAIL_USERNAME` / `MAIL_PASSWORD` | Envío real de correo por Gmail SMTP (App Password) |
+| `PORT` | Puerto HTTP, inyectado automáticamente por Render |
+
 ## Metodología
 
 El desarrollo sigue Scrum, organizado en 6 Sprints (uno por Historia de Usuario), cada uno en su propia rama (`sprint-1-autenticacion`, `sprint-2-ejercicios`, etc.), más ramas adicionales para mejoras posteriores (rangos de entrenamiento, verificación por correo, catálogo de ejercicios, rediseño visual, entre otras).
