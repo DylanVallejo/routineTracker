@@ -47,7 +47,7 @@ flowchart LR
         D[Spring Security + JWT]
     end
     E[(MySQL 8<br/>routine_tracker_db)]
-    F[Gmail SMTP]
+    F[API de correo transaccional]
 
     A <--> B
     B <-- "HTTP/JSON + JWT" --> C
@@ -57,7 +57,7 @@ flowchart LR
     C -- "verificación de cuenta /<br/>recuperación de contraseña" --> F
 ```
 
-El frontend es una SPA en React que consume la API REST del backend por HTTP, autenticando cada request con un JWT emitido en el login. El backend valida y persiste todo contra MySQL, y envía correos reales (verificación de cuenta, recuperación de contraseña) vía SMTP de Gmail.
+El frontend es una SPA en React que consume la API REST del backend por HTTP, autenticando cada request con un JWT emitido en el login. El backend valida y persiste todo contra MySQL, y envía correos reales (verificación de cuenta, recuperación de contraseña) vía la API HTTP de un proveedor de correo transaccional.
 
 ### Flujo de uso
 
@@ -114,7 +114,7 @@ mvn spring-boot:run
 
 Corre en `http://localhost:8080`. Las credenciales de la base de datos se configuran con las variables de entorno `DB_USERNAME` y `DB_PASSWORD` (por defecto `root`/`root`, ver `src/main/resources/application.properties`).
 
-Para envío real de correo (verificación/recuperación), configurar `MAIL_ENABLED=true`, `MAIL_USERNAME` y `MAIL_PASSWORD` (App Password de Gmail) como variables de entorno, o en un `application-local.properties` local (no versionado). Sin esto, el envío queda en modo desarrollo: el enlace se escribe en el log en vez de enviarse.
+Para envío real de correo (verificación/recuperación), configurar `MAIL_ENABLED=true` y `BREVO_API_KEY` (API key de [Brevo](https://www.brevo.com), plan gratuito) como variables de entorno, o en un `application-local.properties` local (no versionado). Sin esto, el envío queda en modo desarrollo: el enlace se escribe en el log en vez de enviarse.
 
 ### Frontend
 
@@ -133,7 +133,7 @@ flowchart LR
     U[Usuario] --> V["Frontend · Vercel"]
     V -- "HTTP/JSON + JWT" --> R["Backend · Render<br/>(Docker)"]
     R --> M[("MySQL · Clever Cloud")]
-    R -- "verificación / recuperación" --> G[Gmail SMTP]
+    R -- "verificación / recuperación (API HTTP)" --> G[Brevo]
 ```
 
 - **Frontend**: desplegado en **Vercel** (build de Vite), apuntando a la API mediante la variable `VITE_API_URL`.
@@ -149,7 +149,7 @@ El backend recibe su configuración de entorno íntegramente por variables (nunc
 | `JWT_SECRET` | Clave de firma de los tokens JWT (distinta a la de ejemplo del repo) |
 | `CORS_ALLOWED_ORIGIN` | Dominio del frontend permitido por CORS (Vercel) |
 | `FRONTEND_URL` | Dominio del frontend usado para armar los enlaces de verificación/recuperación en los correos |
-| `MAIL_ENABLED` / `MAIL_USERNAME` / `MAIL_PASSWORD` | Envío real de correo por Gmail SMTP (App Password) |
+| `MAIL_ENABLED` / `BREVO_API_KEY` / `MAIL_FROM` | Envío real de correo vía API HTTP de Brevo (Render bloquea los puertos SMTP salientes en su plan gratis) |
 | `PORT` | Puerto HTTP, inyectado automáticamente por Render |
 
 ## Metodología
