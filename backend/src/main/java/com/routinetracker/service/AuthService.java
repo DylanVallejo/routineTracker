@@ -17,6 +17,8 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -28,8 +30,16 @@ public class AuthService {
     private final CuentaService cuentaService;
 
     public void register(RegisterRequest request) {
-        if (usuarioRepository.existsByCorreo(request.getCorreo())) {
-            throw new EmailYaRegistradoException(request.getCorreo());
+        Optional<Usuario> existente = usuarioRepository.findByCorreo(request.getCorreo());
+        if (existente.isPresent()) {
+            if (existente.get().isVerificado()) {
+                throw new EmailYaRegistradoException(request.getCorreo());
+            }
+            // Cuenta creada en un intento anterior que nunca llego a verificarse
+            // (ej. el correo de confirmacion fallo o nunca se recibio): reintentar
+            // el registro reenvia el correo en vez de dejar la cuenta sin salida.
+            cuentaService.reenviarVerificacion(request.getCorreo());
+            return;
         }
 
         Usuario usuario = Usuario.builder()
