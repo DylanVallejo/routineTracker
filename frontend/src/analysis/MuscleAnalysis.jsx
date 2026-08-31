@@ -19,7 +19,8 @@ import LoadingSpinner from '../components/LoadingSpinner'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
-const NEUTRO = '#847f7c'
+const EXITO = '#409d48'
+const ALERTA = '#c53637'
 
 const FRECUENCIA_MINIMA_SEMANAL = 2
 
@@ -191,7 +192,10 @@ export default function MuscleAnalysis() {
       {
         label: 'Veces entrenado',
         data: frecuencias,
-        backgroundColor: NEUTRO,
+        backgroundColor: datosFiltrados.map((d) => {
+          const bajoMinimo = frecuenciaMinima != null ? d.frecuencia < frecuenciaMinima : d.frecuencia === minimo
+          return bajoMinimo ? ALERTA : EXITO
+        }),
         borderRadius: 2,
       },
     ],
