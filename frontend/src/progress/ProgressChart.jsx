@@ -139,7 +139,7 @@ export default function ProgressChart() {
       {ejerciciosDisponibles.length === 0 ? (
         <p>No tienes ejercicios registrados todavía.</p>
       ) : cargando ? (
-        <LoadingSpinner contenedor={false} />
+        <LoadingSpinner contenedor={false} alto="420px" />
       ) : puntos.length === 0 ? (
         <p>No hay registros de este ejercicio en el periodo seleccionado.</p>
       ) : (

@@ -234,7 +234,7 @@ export default function MuscleAnalysis() {
       {error && <p className="auth-error">{error}</p>}
 
       {cargando ? (
-        <LoadingSpinner contenedor={false} />
+        <LoadingSpinner contenedor={false} alto="420px" />
       ) : (
         <>
           {grupoMuscular === 'TODOS' && grupoMenosTrabajado && (
@@ -376,7 +376,7 @@ export default function MuscleAnalysis() {
       {errorVolumen && <p className="auth-error">{errorVolumen}</p>}
 
       {!rangoVolumenListo ? null : cargandoVolumen ? (
-        <LoadingSpinner contenedor={false} />
+        <LoadingSpinner contenedor={false} alto="440px" />
       ) : (
         <>
           <div className="zonas-leyenda">
