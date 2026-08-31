@@ -21,6 +21,14 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 const EXITO = '#409d48'
 const ALERTA = '#c53637'
 
+const FRECUENCIA_MINIMA_SEMANAL = 2
+
+function calcularFrecuenciaMinima(periodo) {
+  const dias = Number(periodo)
+  if (!dias) return null
+  return Math.round((FRECUENCIA_MINIMA_SEMANAL * dias) / 7)
+}
+
 function formatearFechaCorta(fechaIso) {
   const fecha = new Date(`${fechaIso}T00:00:00`)
   return fecha.toLocaleDateString('es-EC', { day: '2-digit', month: '2-digit', year: 'numeric' })
@@ -132,8 +140,11 @@ export default function MuscleAnalysis() {
     grupoMuscular === 'TODOS' ? datos : datos.filter((d) => d.grupoMuscular === grupoMuscular)
 
   const frecuencias = datosFiltrados.map((d) => d.frecuencia)
+  const frecuenciaMinima = calcularFrecuenciaMinima(periodo)
   const minimo = frecuencias.length > 0 ? Math.min(...frecuencias) : 0
   const grupoMenosTrabajado = datosFiltrados.find((d) => d.frecuencia === minimo)
+  const gruposBajoMinimo =
+    frecuenciaMinima != null ? datosFiltrados.filter((d) => d.frecuencia < frecuenciaMinima) : []
 
   const chartData = {
     labels: datosFiltrados.map((d) => etiquetaGrupoMuscular(d.grupoMuscular)),
@@ -141,7 +152,10 @@ export default function MuscleAnalysis() {
       {
         label: 'Veces entrenado',
         data: frecuencias,
-        backgroundColor: datosFiltrados.map((d) => (d.frecuencia === minimo ? ALERTA : EXITO)),
+        backgroundColor: datosFiltrados.map((d) => {
+          const bajoMinimo = frecuenciaMinima != null ? d.frecuencia < frecuenciaMinima : d.frecuencia === minimo
+          return bajoMinimo ? ALERTA : EXITO
+        }),
         borderRadius: 2,
       },
     ],
@@ -233,11 +247,34 @@ export default function MuscleAnalysis() {
 
       {error && <p className="auth-error">{error}</p>}
 
+      <p className="analisis-nota">
+        Referencia: se recomienda entrenar cada grupo muscular al menos {FRECUENCIA_MINIMA_SEMANAL} veces por semana
+        {frecuenciaMinima != null && ` (~${frecuenciaMinima} veces en este período)`}.
+      </p>
+
       {cargando ? (
         <LoadingSpinner contenedor={false} alto="420px" />
       ) : (
         <>
-          {grupoMuscular === 'TODOS' && grupoMenosTrabajado && (
+          {grupoMuscular === 'TODOS' && frecuenciaMinima != null && (
+            gruposBajoMinimo.length === 0 ? (
+              <p className="analisis-destacado">
+                Todos los grupos musculares alcanzan la frecuencia mínima recomendada (
+                {frecuenciaMinima} {frecuenciaMinima === 1 ? 'vez' : 'veces'}) en este período.
+              </p>
+            ) : (
+              <p className="analisis-destacado">
+                No alcanzan la frecuencia mínima recomendada ({frecuenciaMinima}{' '}
+                {frecuenciaMinima === 1 ? 'vez' : 'veces'}):{' '}
+                <strong>
+                  {gruposBajoMinimo.map((d) => etiquetaGrupoMuscular(d.grupoMuscular)).join(', ')}
+                </strong>
+                .
+              </p>
+            )
+          )}
+
+          {grupoMuscular === 'TODOS' && frecuenciaMinima == null && grupoMenosTrabajado && (
             <p className="analisis-destacado">
               Grupo muscular menos trabajado:{' '}
               <strong>{etiquetaGrupoMuscular(grupoMenosTrabajado.grupoMuscular)}</strong> (
@@ -250,7 +287,12 @@ export default function MuscleAnalysis() {
             <p className="analisis-destacado">
               <strong>{etiquetaGrupoMuscular(grupoMenosTrabajado.grupoMuscular)}</strong>{' '}
               entrenado {grupoMenosTrabajado.frecuencia}{' '}
-              {grupoMenosTrabajado.frecuencia === 1 ? 'vez' : 'veces'} en este periodo.
+              {grupoMenosTrabajado.frecuencia === 1 ? 'vez' : 'veces'} en este período
+              {frecuenciaMinima != null &&
+                (grupoMenosTrabajado.frecuencia < frecuenciaMinima
+                  ? ` — no alcanza la frecuencia mínima recomendada (${frecuenciaMinima}).`
+                  : ` — alcanza la frecuencia mínima recomendada (${frecuenciaMinima}).`)}
+              {frecuenciaMinima == null && '.'}
             </p>
           )}
 
@@ -258,7 +300,7 @@ export default function MuscleAnalysis() {
             <Bar data={chartData} options={chartOptions} />
           </div>
 
-          {grupoMuscular === 'TODOS' && frecuencias.length > 1 && minimo === Math.max(...frecuencias) && (
+          {grupoMuscular === 'TODOS' && frecuenciaMinima == null && frecuencias.length > 1 && minimo === Math.max(...frecuencias) && (
             <p className="analisis-nota">
               Todos los grupos musculares tienen la misma frecuencia en este periodo.
             </p>
