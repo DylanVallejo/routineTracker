@@ -91,13 +91,15 @@ Detalle de cómo se calculan las métricas y qué reglas aplica el backend, más
 
 Cuenta **sesiones distintas** en las que aparece cada grupo muscular, no filas de ejercicio: una sesión con tres ejercicios de Pecho suma 1 a la frecuencia de Pecho, no 3. Esto evita que repetir ejercicios de un mismo grupo dentro de una sesión (algo normal en un entrenamiento real) infle artificialmente el conteo.
 
-La app compara esa frecuencia contra una **referencia mínima recomendada de 2 veces por semana** por grupo muscular (estándar general de la ciencia del entrenamiento de fuerza), escalada al período elegido:
+La app muestra, solo como **dato de referencia informativo** (nunca como veredicto de bien/mal), cuántas veces se recomienda entrenar cada grupo muscular como mínimo — **2 veces por semana**, un valor citado en la ciencia del entrenamiento de fuerza (ej. Schoenfeld et al. 2016), escalado al período elegido:
 
 ```
-frecuencia_minima = round(2 × dias_del_periodo / 7)
+frecuencia_minima = floor(2 × dias_del_periodo / 7)
 ```
 
-Las barras se colorean en rojo si el grupo no alcanza esa frecuencia mínima en el período, y en verde si la alcanza — no es una comparación relativa contra los demás grupos, sino contra un umbral absoluto. El período "Todo el historial" no tiene un número de días fijo, así que ahí no se calcula un mínimo: en ese caso se destaca simplemente el grupo con menor frecuencia relativa entre los 10.
+Para el período "Todo el historial" (sin un número de días fijo), los días se calculan desde la fecha de la primera sesión registrada hasta hoy — igual que ya lo hace el backend para el volumen semanal — y esa misma fecha se muestra como el rango del período, en vez del texto genérico "todo el historial".
+
+El texto destacado indica qué grupos no llegan a esa referencia, pero **las barras del gráfico no se colorean por esto**: entrenar un grupo menos de 2 veces por semana no es un error, es una elección de rutina válida (por ejemplo, un split por grupo muscular entrena cada uno 1 vez por semana de forma intencional). El color de las barras es neutro; la referencia es solo informativa.
 
 ### Volumen semanal (sets) y zonas MEV/MAV/MRV
 
