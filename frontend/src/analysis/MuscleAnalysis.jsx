@@ -12,13 +12,12 @@ import { Bar } from 'react-chartjs-2'
 import { obtenerAnalisisMuscular, obtenerAnalisisVolumen } from '../api/analisisService'
 import { GRUPOS_MUSCULARES, etiquetaGrupoMuscular } from '../constants/gruposMusculares'
 import { PERIODOS, calcularRangoPeriodo } from '../constants/periodos'
-import { ZONAS_VOLUMEN, TOPE_GRAFICO, clasificarVolumen } from '../constants/zonasVolumen'
+import { ZONAS_VOLUMEN, TOPE_GRAFICO, clasificarVolumen, colorPorVolumen } from '../constants/zonasVolumen'
 import { bandasPlugin } from '../charts/bandasPlugin'
 import LoadingSpinner from '../components/LoadingSpinner'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
-const ACENTO = '#d33b36'
 const EXITO = '#409d48'
 const ALERTA = '#c53637'
 
@@ -27,9 +26,13 @@ export default function MuscleAnalysis() {
   const [grupoMuscular, setGrupoMuscular] = useState('TODOS')
   const [datos, setDatos] = useState([])
   const [datosVolumen, setDatosVolumen] = useState([])
+  const [inicioVolumen, setInicioVolumen] = useState('')
+  const [finVolumen, setFinVolumen] = useState('')
   const [mostrarInfoVolumen, setMostrarInfoVolumen] = useState(false)
   const [error, setError] = useState('')
+  const [errorVolumen, setErrorVolumen] = useState('')
   const [cargando, setCargando] = useState(true)
+  const [cargandoVolumen, setCargandoVolumen] = useState(true)
 
   useEffect(() => {
     let activo = true
@@ -38,14 +41,9 @@ export default function MuscleAnalysis() {
       setCargando(true)
       setError('')
       try {
-        const rango = calcularRangoPeriodo(periodo)
-        const [resultado, resultadoVolumen] = await Promise.all([
-          obtenerAnalisisMuscular(rango),
-          obtenerAnalisisVolumen(rango),
-        ])
+        const resultado = await obtenerAnalisisMuscular(calcularRangoPeriodo(periodo))
         if (!activo) return
         setDatos(resultado)
-        setDatosVolumen(resultadoVolumen)
       } catch (err) {
         if (activo) setError(err.response?.data?.mensaje || 'No se pudo cargar el análisis muscular')
       } finally {
@@ -58,6 +56,38 @@ export default function MuscleAnalysis() {
       activo = false
     }
   }, [periodo])
+
+  useEffect(() => {
+    let activo = true
+
+    async function cargarVolumen() {
+      setCargandoVolumen(true)
+      setErrorVolumen('')
+      try {
+        const rango =
+          inicioVolumen && finVolumen
+            ? { inicio: inicioVolumen, fin: finVolumen }
+            : calcularRangoPeriodo('30')
+        const resultado = await obtenerAnalisisVolumen(rango)
+        if (!activo) return
+        setDatosVolumen(resultado)
+      } catch (err) {
+        if (activo) setErrorVolumen(err.response?.data?.mensaje || 'No se pudo cargar el volumen semanal')
+      } finally {
+        if (activo) setCargandoVolumen(false)
+      }
+    }
+
+    cargarVolumen()
+    return () => {
+      activo = false
+    }
+  }, [inicioVolumen, finVolumen])
+
+  function limpiarFiltroVolumen() {
+    setInicioVolumen('')
+    setFinVolumen('')
+  }
 
   const datosFiltrados =
     grupoMuscular === 'TODOS' ? datos : datos.filter((d) => d.grupoMuscular === grupoMuscular)
@@ -104,7 +134,7 @@ export default function MuscleAnalysis() {
       {
         label: 'Sets por semana',
         data: volumenFiltrado.map((d) => d.setsPorSemana),
-        backgroundColor: ACENTO,
+        backgroundColor: volumenFiltrado.map((d) => colorPorVolumen(d.setsPorSemana)),
         borderRadius: 2,
       },
     ],
@@ -193,52 +223,89 @@ export default function MuscleAnalysis() {
               Todos los grupos musculares tienen la misma frecuencia en este periodo.
             </p>
           )}
+        </>
+      )}
 
-          <div className="page-header analisis-subheader">
-            <h2>Volumen semanal (sets)</h2>
-            <button
-              type="button"
-              className="info-toggle"
-              onClick={() => setMostrarInfoVolumen((valor) => !valor)}
-              aria-expanded={mostrarInfoVolumen}
-              aria-label="Qué significa MV, MEV, MAV y MRV"
-            >
-              i
-            </button>
-          </div>
+      <div className="page-header analisis-subheader">
+        <h2>Volumen semanal (sets)</h2>
+        <button
+          type="button"
+          className="info-toggle"
+          onClick={() => setMostrarInfoVolumen((valor) => !valor)}
+          aria-expanded={mostrarInfoVolumen}
+          aria-label="Qué significa MV, MEV, MAV y MRV"
+        >
+          i
+        </button>
+      </div>
 
-          {mostrarInfoVolumen && (
-            <div className="info-panel">
-              <p>
-                Estas siglas indican cuántas series ("sets") por semana necesita un grupo muscular
-                para crecer, según la ciencia del entrenamiento de fuerza:
-              </p>
-              <ul>
-                <li>
-                  <strong>MV</strong> (Volumen de mantenimiento): lo mínimo para no perder músculo,
-                  sin buscar crecer.
-                </li>
-                <li>
-                  <strong>MEV</strong> (Volumen mínimo efectivo): a partir de aquí el músculo
-                  empieza a crecer.
-                </li>
-                <li>
-                  <strong>MAV</strong> (Volumen adaptativo máximo): el rango donde más crece la
-                  mayoría de personas.
-                </li>
-                <li>
-                  <strong>MRV</strong> (Volumen máximo recuperable): el límite antes de que el
-                  cuerpo ya no pueda recuperarse a tiempo entre entrenamientos.
-                </li>
-              </ul>
-              <p>
-                Son valores generales de referencia (no personalizados a tu experiencia o
-                genética), pensados para orientar cuántas series por semana conviene sumar por
-                grupo muscular.
-              </p>
-            </div>
-          )}
+      {mostrarInfoVolumen && (
+        <div className="info-panel">
+          <p>
+            Estas siglas indican cuántas series ("sets") por semana necesita un grupo muscular
+            para crecer, según la ciencia del entrenamiento de fuerza:
+          </p>
+          <ul>
+            <li>
+              <strong>MV</strong> (Volumen de mantenimiento): lo mínimo para no perder músculo,
+              sin buscar crecer.
+            </li>
+            <li>
+              <strong>MEV</strong> (Volumen mínimo efectivo): a partir de aquí el músculo
+              empieza a crecer.
+            </li>
+            <li>
+              <strong>MAV</strong> (Volumen adaptativo máximo): el rango donde más crece la
+              mayoría de personas.
+            </li>
+            <li>
+              <strong>MRV</strong> (Volumen máximo recuperable): el límite antes de que el
+              cuerpo ya no pueda recuperarse a tiempo entre entrenamientos.
+            </li>
+          </ul>
+          <p>
+            Son valores generales de referencia (no personalizados a tu experiencia o
+            genética), pensados para orientar cuántas series por semana conviene sumar por
+            grupo muscular.
+          </p>
+        </div>
+      )}
 
+      <div className="filter-bar">
+        <label htmlFor="inicioVolumen">Desde</label>
+        <input
+          id="inicioVolumen"
+          type="date"
+          value={inicioVolumen}
+          onChange={(e) => setInicioVolumen(e.target.value)}
+        />
+        <label htmlFor="finVolumen">Hasta</label>
+        <input
+          id="finVolumen"
+          type="date"
+          value={finVolumen}
+          onChange={(e) => setFinVolumen(e.target.value)}
+        />
+        {(inicioVolumen || finVolumen) && (
+          <button type="button" onClick={limpiarFiltroVolumen}>
+            Limpiar
+          </button>
+        )}
+      </div>
+
+      {!inicioVolumen && !finVolumen && (
+        <p className="analisis-nota">
+          Mostrando los últimos 30 días. Elegí "Desde"/"Hasta" para ver otro período, independiente
+          del filtro de arriba.
+        </p>
+      )}
+
+      {errorVolumen && <p className="auth-error">{errorVolumen}</p>}
+
+      {cargandoVolumen ? (
+        <LoadingSpinner contenedor={false} />
+      ) : (
+        <>
           <div className="zonas-leyenda">
             {ZONAS_VOLUMEN.map((zona) => (
               <span key={zona.nombre}>

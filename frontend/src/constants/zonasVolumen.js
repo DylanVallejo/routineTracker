@@ -19,3 +19,11 @@ export function clasificarVolumen(setsPorSemana) {
   if (setsPorSemana <= MRV) return 'Cerca del límite'
   return 'Riesgo de sobreentrenamiento'
 }
+
+export function colorPorVolumen(setsPorSemana) {
+  if (setsPorSemana < MV) return ZONAS_VOLUMEN[0].swatch
+  if (setsPorSemana < MEV) return ZONAS_VOLUMEN[1].swatch
+  if (setsPorSemana <= MAV) return ZONAS_VOLUMEN[2].swatch
+  if (setsPorSemana <= MRV) return ZONAS_VOLUMEN[3].swatch
+  return ZONAS_VOLUMEN[4].swatch
+}
