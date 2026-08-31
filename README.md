@@ -118,7 +118,9 @@ El resultado se clasifica en 5 zonas de referencia (basadas en la ciencia del en
 | Cerca del límite | 20 – 25 (MAV–MRV) | Amarillo |
 | Riesgo de sobreentrenamiento | > 25 (MRV) | Rojo |
 
-Cada barra del gráfico toma el color de la zona en la que cae su valor (no un color fijo), coherente con las bandas de fondo. El filtro de fechas de esta sección es **independiente** del filtro de la gráfica de frecuencia de arriba — por defecto ambos usan los últimos 30 días, pero cambiar uno no afecta al otro.
+Cada barra del gráfico toma el color de la zona en la que cae su valor (no un color fijo), coherente con las bandas de fondo. El filtro de fechas de esta sección tiene sus propios presets (7/30/90 días/Todo) y una opción "Personalizado" con Desde/Hasta, **independiente** del filtro de la gráfica de frecuencia de arriba — cambiar uno no afecta al otro.
+
+**Navegación por semana:** los botones "Semana anterior/siguiente" se mueven por **semanas calendario** (lunes a domingo), no por el ancho del período que estuviera activo antes. Cada click recalcula el lunes de la semana correspondiente y la posiciona como rango personalizado; la semana que contiene hoy se corta en el día actual (no se extiende al domingo, que sería futuro), y "Semana siguiente" se deshabilita apenas se llega a esa semana en curso. Todo el cálculo de fechas usa componentes de fecha **local** del navegador (no `toISOString()`, que convierte a UTC) para evitar que el corte de "hoy" quede corrido un día según la zona horaria.
 
 ### Progreso por ejercicio
 

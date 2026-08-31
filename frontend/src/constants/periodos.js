@@ -6,7 +6,12 @@ export const PERIODOS = [
 ]
 
 function formatearFecha(fecha) {
-  return fecha.toISOString().slice(0, 10)
+  // Usa componentes de fecha local (no toISOString, que convierte a UTC y
+  // puede quedar un dia adelante o atras segun la zona horaria del navegador).
+  const y = fecha.getFullYear()
+  const m = String(fecha.getMonth() + 1).padStart(2, '0')
+  const d = String(fecha.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
 }
 
 export function calcularRangoPeriodo(valorPeriodo) {

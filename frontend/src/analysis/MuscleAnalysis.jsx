@@ -55,11 +55,25 @@ function formatearRango(rango) {
 }
 
 function formatearFechaISO(fecha) {
-  return fecha.toISOString().slice(0, 10)
+  // Componentes de fecha local, no toISOString (UTC) -- ver mismo comentario
+  // en constants/periodos.js.
+  const y = fecha.getFullYear()
+  const m = String(fecha.getMonth() + 1).padStart(2, '0')
+  const d = String(fecha.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
 }
 
 function hoyISO() {
   return formatearFechaISO(new Date())
+}
+
+function lunesDeLaSemana(fecha) {
+  const d = new Date(fecha)
+  const dia = d.getDay()
+  const diff = dia === 0 ? -6 : 1 - dia
+  d.setDate(d.getDate() + diff)
+  d.setHours(0, 0, 0, 0)
+  return d
 }
 
 export default function MuscleAnalysis() {
@@ -157,11 +171,26 @@ export default function MuscleAnalysis() {
   }
 
   function moverSemanaVolumen(delta) {
-    if (!rangoVolumen.inicio || !rangoVolumen.fin) return
-    const nuevoInicio = new Date(`${rangoVolumen.inicio}T00:00:00`)
-    const nuevoFin = new Date(`${rangoVolumen.fin}T00:00:00`)
+    // Navega por semanas calendario (lunes a domingo), no por el ancho del
+    // periodo activo: asi cada "semana" es siempre un bloque de 7 dias real,
+    // y la semana actual llega justo hasta hoy en vez de quedar corta o
+    // pasarse hacia el futuro.
+    const ancla =
+      esPersonalizado && inicioVolumen
+        ? lunesDeLaSemana(new Date(`${inicioVolumen}T00:00:00`))
+        : lunesDeLaSemana(new Date())
+
+    const nuevoInicio = new Date(ancla)
     nuevoInicio.setDate(nuevoInicio.getDate() + delta * 7)
-    nuevoFin.setDate(nuevoFin.getDate() + delta * 7)
+
+    const hoy = new Date()
+    hoy.setHours(0, 0, 0, 0)
+    if (nuevoInicio > hoy) return
+
+    const nuevoFinCompleto = new Date(nuevoInicio)
+    nuevoFinCompleto.setDate(nuevoFinCompleto.getDate() + 6)
+    const nuevoFin = nuevoFinCompleto > hoy ? hoy : nuevoFinCompleto
+
     setPeriodoVolumen('personalizado')
     setInicioVolumen(formatearFechaISO(nuevoInicio))
     setFinVolumen(formatearFechaISO(nuevoFin))
