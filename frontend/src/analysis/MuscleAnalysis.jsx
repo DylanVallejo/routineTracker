@@ -31,6 +31,14 @@ function formatearRango(rango) {
   return `${formatearFechaCorta(rango.inicio)} – ${formatearFechaCorta(rango.fin)}`
 }
 
+function formatearFechaISO(fecha) {
+  return fecha.toISOString().slice(0, 10)
+}
+
+function hoyISO() {
+  return formatearFechaISO(new Date())
+}
+
 export default function MuscleAnalysis() {
   const [periodo, setPeriodo] = useState('30')
   const [grupoMuscular, setGrupoMuscular] = useState('TODOS')
@@ -106,6 +114,19 @@ export default function MuscleAnalysis() {
       setFinVolumen('')
     }
   }
+
+  function moverSemanaVolumen(delta) {
+    if (!rangoVolumen.inicio || !rangoVolumen.fin) return
+    const nuevoInicio = new Date(`${rangoVolumen.inicio}T00:00:00`)
+    const nuevoFin = new Date(`${rangoVolumen.fin}T00:00:00`)
+    nuevoInicio.setDate(nuevoInicio.getDate() + delta * 7)
+    nuevoFin.setDate(nuevoFin.getDate() + delta * 7)
+    setPeriodoVolumen('personalizado')
+    setInicioVolumen(formatearFechaISO(nuevoInicio))
+    setFinVolumen(formatearFechaISO(nuevoFin))
+  }
+
+  const puedeAvanzarSemanaVolumen = rangoVolumen.fin && rangoVolumen.fin < hoyISO()
 
   const datosFiltrados =
     grupoMuscular === 'TODOS' ? datos : datos.filter((d) => d.grupoMuscular === grupoMuscular)
@@ -324,6 +345,26 @@ export default function MuscleAnalysis() {
           </>
         ) : (
           <span className="periodo-rango">({formatearRango(rangoVolumen)})</span>
+        )}
+
+        {periodoVolumen !== 'todo' && (
+          <span className="semana-nav">
+            <button
+              type="button"
+              onClick={() => moverSemanaVolumen(-1)}
+              aria-label="Retroceder una semana"
+            >
+              ← Semana anterior
+            </button>
+            <button
+              type="button"
+              onClick={() => moverSemanaVolumen(1)}
+              disabled={!puedeAvanzarSemanaVolumen}
+              aria-label="Avanzar una semana"
+            >
+              Semana siguiente →
+            </button>
+          </span>
         )}
       </div>
 
