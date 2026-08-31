@@ -311,7 +311,7 @@ export default function MuscleAnalysis() {
         </div>
       )}
 
-      <div className="filter-bar">
+      <div className="filter-bar filter-bar-volumen">
         <label htmlFor="periodoVolumen">Periodo</label>
         <select
           id="periodoVolumen"
@@ -361,6 +361,7 @@ export default function MuscleAnalysis() {
               onClick={() => moverSemanaVolumen(1)}
               disabled={!puedeAvanzarSemanaVolumen}
               aria-label="Avanzar una semana"
+              title={puedeAvanzarSemanaVolumen ? undefined : 'No se puede ver una semana futura'}
             >
               Semana siguiente <span className="flecha">→</span>
             </button>

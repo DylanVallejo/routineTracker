@@ -905,6 +905,19 @@ a {
   cursor: pointer;
 }
 
+.filter-bar button[type='button']:disabled {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+  background: var(--color-paper);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.filter-bar-volumen {
+  min-height: 5.75rem;
+  align-content: flex-start;
+}
+
 @media (max-width: 480px) {
   .filter-bar {
     flex-direction: column;
