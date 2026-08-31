@@ -34,10 +34,13 @@ public class AnalisisService {
         Usuario usuario = authenticatedUserProvider.getUsuarioActual();
         List<Sesion> sesiones = obtenerSesiones(usuario.getId(), inicio, fin);
 
+        // Cuenta dias/sesiones distintas en las que aparece cada grupo, no cada fila de ejercicio:
+        // una sesion con 3 ejercicios de Pecho debe sumar 1 a la frecuencia de Pecho, no 3.
         Map<GrupoMuscular, Long> frecuenciaPorGrupo = sesiones.stream()
-                .flatMap(sesion -> sesion.getEjercicios().stream())
-                .map(SesionEjercicio::getEjercicio)
-                .collect(Collectors.groupingBy(com.routinetracker.entity.Ejercicio::getGrupoMuscular, Collectors.counting()));
+                .flatMap(sesion -> sesion.getEjercicios().stream()
+                        .map(se -> se.getEjercicio().getGrupoMuscular())
+                        .distinct())
+                .collect(Collectors.groupingBy(grupo -> grupo, Collectors.counting()));
 
         return Arrays.stream(GrupoMuscular.values())
                 .map(grupo -> new AnalisisMuscularResponse(grupo, frecuenciaPorGrupo.getOrDefault(grupo, 0L)))
