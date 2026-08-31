@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { agregarEjercicioDesdeCatalogo, listarCatalogoEjercicios } from '../api/ejercicioService'
-import { etiquetaGrupoMuscular } from '../constants/gruposMusculares'
+import { GRUPOS_MUSCULARES, etiquetaGrupoMuscular } from '../constants/gruposMusculares'
 import VideoPlayer from '../components/VideoPlayer'
 import LoadingSpinner from '../components/LoadingSpinner'
 
 export default function ExerciseCatalog() {
   const [catalogo, setCatalogo] = useState([])
+  const [grupoMuscular, setGrupoMuscular] = useState('TODOS')
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState('')
@@ -35,7 +36,10 @@ export default function ExerciseCatalog() {
     }
   }
 
-  const grupos = catalogo.reduce((acc, item) => {
+  const catalogoFiltrado =
+    grupoMuscular === 'TODOS' ? catalogo : catalogo.filter((item) => item.grupoMuscular === grupoMuscular)
+
+  const grupos = catalogoFiltrado.reduce((acc, item) => {
     const lista = acc.get(item.grupoMuscular) || []
     lista.push(item)
     acc.set(item.grupoMuscular, lista)
@@ -56,11 +60,29 @@ export default function ExerciseCatalog() {
         listado, o crea uno personalizado desde cero.
       </p>
 
+      <div className="filter-bar">
+        <label htmlFor="grupoMuscular">Grupo muscular</label>
+        <select
+          id="grupoMuscular"
+          value={grupoMuscular}
+          onChange={(e) => setGrupoMuscular(e.target.value)}
+        >
+          <option value="TODOS">Todos</option>
+          {GRUPOS_MUSCULARES.map((g) => (
+            <option key={g.value} value={g.value}>
+              {g.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {error && <p className="auth-error">{error}</p>}
       {mensaje && <p className="auth-info">{mensaje}</p>}
 
       {cargando ? (
         <LoadingSpinner contenedor={false} />
+      ) : grupos.size === 0 ? (
+        <p>No hay ejercicios del catálogo para este grupo muscular.</p>
       ) : (
         Array.from(grupos.entries()).map(([grupo, items]) => (
           <section key={grupo} className="catalogo-grupo">
