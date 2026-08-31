@@ -99,7 +99,7 @@ frecuencia_minima = floor(2 × dias_del_periodo / 7)
 
 Para el período "Todo el historial" (sin un número de días fijo), los días se calculan desde la fecha de la primera sesión registrada hasta hoy — igual que ya lo hace el backend para el volumen semanal — y esa misma fecha se muestra como el rango del período, en vez del texto genérico "todo el historial".
 
-El texto destacado indica qué grupos no llegan a esa referencia, pero **las barras del gráfico no se colorean por esto**: entrenar un grupo menos de 2 veces por semana no es un error, es una elección de rutina válida (por ejemplo, un split por grupo muscular entrena cada uno 1 vez por semana de forma intencional). El color de las barras es neutro; la referencia es solo informativa.
+Las barras se colorean en rojo si el grupo no alcanza esa referencia mínima, y en verde si la alcanza — igual que en Volumen, es una comparación contra un umbral absoluto, no contra el mínimo relativo de los demás grupos. El texto destacado lista además qué grupos no llegan (o confirma que todos llegan). Vale aclarar que no alcanzar esta referencia no es necesariamente un error: un split por grupo muscular entrena cada uno 1 vez por semana de forma intencional, así que el color es una señal de referencia, no un veredicto definitivo sobre la rutina elegida.
 
 ### Volumen semanal (sets) y zonas MEV/MAV/MRV
 
