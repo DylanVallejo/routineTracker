@@ -21,11 +21,22 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 const EXITO = '#409d48'
 const ALERTA = '#c53637'
 
+function formatearFechaCorta(fechaIso) {
+  const fecha = new Date(`${fechaIso}T00:00:00`)
+  return fecha.toLocaleDateString('es-EC', { day: '2-digit', month: '2-digit', year: 'numeric' })
+}
+
+function formatearRango(rango) {
+  if (!rango.inicio || !rango.fin) return 'todo el historial'
+  return `${formatearFechaCorta(rango.inicio)} – ${formatearFechaCorta(rango.fin)}`
+}
+
 export default function MuscleAnalysis() {
   const [periodo, setPeriodo] = useState('30')
   const [grupoMuscular, setGrupoMuscular] = useState('TODOS')
   const [datos, setDatos] = useState([])
   const [datosVolumen, setDatosVolumen] = useState([])
+  const [periodoVolumen, setPeriodoVolumen] = useState('30')
   const [inicioVolumen, setInicioVolumen] = useState('')
   const [finVolumen, setFinVolumen] = useState('')
   const [mostrarInfoVolumen, setMostrarInfoVolumen] = useState(false)
@@ -57,18 +68,21 @@ export default function MuscleAnalysis() {
     }
   }, [periodo])
 
+  const esPersonalizado = periodoVolumen === 'personalizado'
+  const rangoVolumenListo = !esPersonalizado || (inicioVolumen && finVolumen)
+  const rangoVolumen = esPersonalizado
+    ? { inicio: inicioVolumen, fin: finVolumen }
+    : calcularRangoPeriodo(periodoVolumen)
+
   useEffect(() => {
+    if (!rangoVolumenListo) return
     let activo = true
 
     async function cargarVolumen() {
       setCargandoVolumen(true)
       setErrorVolumen('')
       try {
-        const rango =
-          inicioVolumen && finVolumen
-            ? { inicio: inicioVolumen, fin: finVolumen }
-            : calcularRangoPeriodo('30')
-        const resultado = await obtenerAnalisisVolumen(rango)
+        const resultado = await obtenerAnalisisVolumen(rangoVolumen)
         if (!activo) return
         setDatosVolumen(resultado)
       } catch (err) {
@@ -82,11 +96,15 @@ export default function MuscleAnalysis() {
     return () => {
       activo = false
     }
-  }, [inicioVolumen, finVolumen])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [periodoVolumen, inicioVolumen, finVolumen])
 
-  function limpiarFiltroVolumen() {
-    setInicioVolumen('')
-    setFinVolumen('')
+  function handleCambiarPeriodoVolumen(valor) {
+    setPeriodoVolumen(valor)
+    if (valor !== 'personalizado') {
+      setInicioVolumen('')
+      setFinVolumen('')
+    }
   }
 
   const datosFiltrados =
@@ -175,6 +193,7 @@ export default function MuscleAnalysis() {
             </option>
           ))}
         </select>
+        <span className="periodo-rango">({formatearRango(calcularRangoPeriodo(periodo))})</span>
 
         <label htmlFor="grupoMuscular">Grupo muscular</label>
         <select
@@ -272,37 +291,53 @@ export default function MuscleAnalysis() {
       )}
 
       <div className="filter-bar">
-        <label htmlFor="inicioVolumen">Desde</label>
-        <input
-          id="inicioVolumen"
-          type="date"
-          value={inicioVolumen}
-          onChange={(e) => setInicioVolumen(e.target.value)}
-        />
-        <label htmlFor="finVolumen">Hasta</label>
-        <input
-          id="finVolumen"
-          type="date"
-          value={finVolumen}
-          onChange={(e) => setFinVolumen(e.target.value)}
-        />
-        {(inicioVolumen || finVolumen) && (
-          <button type="button" onClick={limpiarFiltroVolumen}>
-            Limpiar
-          </button>
+        <label htmlFor="periodoVolumen">Periodo</label>
+        <select
+          id="periodoVolumen"
+          value={periodoVolumen}
+          onChange={(e) => handleCambiarPeriodoVolumen(e.target.value)}
+        >
+          {PERIODOS.map((p) => (
+            <option key={p.value} value={p.value}>
+              {p.label}
+            </option>
+          ))}
+          <option value="personalizado">Personalizado</option>
+        </select>
+
+        {esPersonalizado ? (
+          <>
+            <label htmlFor="inicioVolumen">Desde</label>
+            <input
+              id="inicioVolumen"
+              type="date"
+              value={inicioVolumen}
+              onChange={(e) => setInicioVolumen(e.target.value)}
+            />
+            <label htmlFor="finVolumen">Hasta</label>
+            <input
+              id="finVolumen"
+              type="date"
+              value={finVolumen}
+              onChange={(e) => setFinVolumen(e.target.value)}
+            />
+          </>
+        ) : (
+          <span className="periodo-rango">({formatearRango(rangoVolumen)})</span>
         )}
       </div>
 
-      {!inicioVolumen && !finVolumen && (
-        <p className="analisis-nota">
-          Mostrando los últimos 30 días. Elegí "Desde"/"Hasta" para ver otro período, independiente
-          del filtro de arriba.
-        </p>
+      <p className="analisis-nota">
+        Este período es independiente del filtro de arriba — cambiar uno no afecta al otro.
+      </p>
+
+      {esPersonalizado && !rangoVolumenListo && (
+        <p className="analisis-nota">Elegí "Desde" y "Hasta" para ver ese rango.</p>
       )}
 
       {errorVolumen && <p className="auth-error">{errorVolumen}</p>}
 
-      {cargandoVolumen ? (
+      {!rangoVolumenListo ? null : cargandoVolumen ? (
         <LoadingSpinner contenedor={false} />
       ) : (
         <>
