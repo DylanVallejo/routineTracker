@@ -89,7 +89,15 @@ Detalle de cómo se calculan las métricas y qué reglas aplica el backend, más
 
 ### Frecuencia por grupo muscular (Análisis)
 
-Cuenta **sesiones distintas** en las que aparece cada grupo muscular, no filas de ejercicio: una sesión con tres ejercicios de Pecho suma 1 a la frecuencia de Pecho, no 3. Esto evita que repetir ejercicios de un mismo grupo dentro de una sesión (algo normal en un entrenamiento real) infle artificialmente el conteo. El "grupo muscular menos trabajado" destacado en rojo es simplemente el mínimo entre los 10 grupos en el período seleccionado.
+Cuenta **sesiones distintas** en las que aparece cada grupo muscular, no filas de ejercicio: una sesión con tres ejercicios de Pecho suma 1 a la frecuencia de Pecho, no 3. Esto evita que repetir ejercicios de un mismo grupo dentro de una sesión (algo normal en un entrenamiento real) infle artificialmente el conteo.
+
+La app compara esa frecuencia contra una **referencia mínima recomendada de 2 veces por semana** por grupo muscular (estándar general de la ciencia del entrenamiento de fuerza), escalada al período elegido:
+
+```
+frecuencia_minima = round(2 × dias_del_periodo / 7)
+```
+
+Las barras se colorean en rojo si el grupo no alcanza esa frecuencia mínima en el período, y en verde si la alcanza — no es una comparación relativa contra los demás grupos, sino contra un umbral absoluto. El período "Todo el historial" no tiene un número de días fijo, así que ahí no se calcula un mínimo: en ese caso se destaca simplemente el grupo con menor frecuencia relativa entre los 10.
 
 ### Volumen semanal (sets) y zonas MEV/MAV/MRV
 
