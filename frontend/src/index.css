@@ -469,6 +469,9 @@ a {
 
 .navbar-links a {
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3xs);
   color: var(--color-ink);
   font-weight: 600;
   font-size: var(--text-sm);
@@ -476,15 +479,28 @@ a {
   letter-spacing: 0.03em;
   text-decoration: none;
   padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+  transition: color var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out);
 }
 
-.navbar-links a:hover {
+.navbar-links a svg {
+  opacity: 0.75;
+  transition: opacity var(--dur-short) var(--ease-out);
+}
+
+.navbar-links a:hover,
+.navbar-links a:hover svg {
   color: var(--color-accent);
+  opacity: 1;
+}
+
+.navbar-links a.navbar-link-active svg {
+  opacity: 1;
 }
 
 .navbar-links a.navbar-link-active {
   color: var(--color-accent);
-  border-bottom: 2px solid var(--color-accent);
+  border-bottom-color: var(--color-accent);
 }
 
 .navbar-user {
@@ -500,6 +516,9 @@ a {
 }
 
 .navbar-user button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3xs);
   padding: 0.45rem 0.9rem;
   border: 1px solid var(--color-ink);
   border-radius: var(--radius-btn);
@@ -542,10 +561,53 @@ a {
   text-transform: uppercase;
 }
 
+/* ---------- Loading spinner ---------- */
+
+.loading-spinner-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 12rem;
+}
+
+.loading-spinner {
+  display: inline-flex;
+  gap: var(--space-2xs);
+}
+
+.loading-spinner-dot {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  animation: loading-spinner-bounce 900ms var(--ease-in-out) infinite;
+}
+
+.loading-spinner-dot:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.loading-spinner-dot:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+@keyframes loading-spinner-bounce {
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: translateY(-0.4rem);
+    opacity: 1;
+  }
+}
+
 /* ---------- Buttons ---------- */
 
 .btn-primary {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3xs);
   padding: 0.65rem 1.15rem;
   border: none;
   border-radius: var(--radius-btn);
@@ -572,6 +634,9 @@ a {
 }
 
 .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3xs);
   padding: 0.55rem 0.9rem;
   border: 1px dashed var(--color-ink-2);
   border-radius: var(--radius-btn);
@@ -636,6 +701,10 @@ a {
 }
 
 .table-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  vertical-align: middle;
   font-weight: 600;
   font-size: var(--text-sm);
   text-decoration: none;
@@ -646,6 +715,10 @@ a {
 }
 
 .table-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  vertical-align: middle;
   border: none;
   background: none;
   color: var(--color-danger);
@@ -1029,6 +1102,12 @@ a {
   border: 1px solid var(--color-rule);
   border-top: 4px solid var(--color-accent);
   box-shadow: var(--shadow-hard-sm);
+  transition: transform var(--dur-med) var(--ease-out), box-shadow var(--dur-med) var(--ease-out);
+}
+
+.catalogo-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 5px 5px 0 0 var(--color-ink);
 }
 
 .catalogo-card h3 {
@@ -1050,4 +1129,71 @@ a {
 .catalogo-card .btn-primary:disabled {
   cursor: default;
   opacity: 0.6;
+}
+
+/* ---------- Confirm dialog ---------- */
+
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  background: rgba(28, 21, 18, 0.55);
+  animation: confirm-overlay-in var(--dur-med) var(--ease-out);
+}
+
+.confirm-dialog {
+  width: 100%;
+  max-width: 24rem;
+  padding: var(--space-lg);
+  background: var(--color-paper);
+  border-top: 4px solid var(--color-accent);
+  box-shadow: var(--shadow-hard);
+  animation: confirm-dialog-in var(--dur-med) var(--ease-out);
+}
+
+.confirm-dialog p {
+  margin: 0 0 var(--space-md);
+  font-size: var(--text-md);
+  color: var(--color-ink);
+}
+
+.confirm-dialog-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+}
+
+.confirm-dialog-peligro {
+  padding: 0.65rem 1.15rem;
+  border: none;
+  border-radius: var(--radius-btn);
+  background-color: var(--color-danger);
+  color: var(--color-accent-ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  box-shadow: var(--shadow-hard-sm);
+  transition: transform var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out);
+}
+
+.confirm-dialog-peligro:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 0 var(--color-ink);
+}
+
+@keyframes confirm-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes confirm-dialog-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }

@@ -13,6 +13,7 @@ import { Line } from 'react-chartjs-2'
 import { listarEjercicios } from '../api/ejercicioService'
 import { obtenerProgreso } from '../api/progresoService'
 import { bandasPlugin } from '../charts/bandasPlugin'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
@@ -120,7 +121,7 @@ export default function ProgressChart() {
           ))}
         </select>
 
-        <label htmlFor="metrica">Metrica</label>
+        <label htmlFor="metrica">Métrica</label>
         <select id="metrica" value={metrica} onChange={(e) => setMetrica(e.target.value)}>
           <option value="peso">Peso</option>
           <option value="repeticiones">Repeticiones</option>
@@ -136,18 +137,18 @@ export default function ProgressChart() {
       {error && <p className="auth-error">{error}</p>}
 
       {ejerciciosDisponibles.length === 0 ? (
-        <p>No tienes ejercicios registrados todavia.</p>
+        <p>No tienes ejercicios registrados todavía.</p>
       ) : cargando ? (
-        <p>Cargando...</p>
+        <LoadingSpinner contenedor={false} />
       ) : puntos.length === 0 ? (
         <p>No hay registros de este ejercicio en el periodo seleccionado.</p>
       ) : (
         <>
           <p className="analisis-destacado">
-            Maximo: <strong>{valores[indiceMax]}</strong>{' '}
+            Máximo: <strong>{valores[indiceMax]}</strong>{' '}
             {metrica === 'peso' ? 'kg' : 'repeticiones'} ({formatearFechaCorta(puntos[indiceMax].fecha)})
             {' · '}
-            Minimo: <strong>{valores[indiceMin]}</strong>{' '}
+            Mínimo: <strong>{valores[indiceMin]}</strong>{' '}
             {metrica === 'peso' ? 'kg' : 'repeticiones'} ({formatearFechaCorta(puntos[indiceMin].fecha)})
           </p>
 

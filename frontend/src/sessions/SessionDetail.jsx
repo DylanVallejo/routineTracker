@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { obtenerSesion } from '../api/sesionService'
 import { etiquetaGrupoMuscular } from '../constants/gruposMusculares'
+import LoadingSpinner from '../components/LoadingSpinner'
+import { IconEditar } from '../components/icons'
 
 function formatearFecha(fechaIso) {
   const fecha = new Date(fechaIso)
@@ -28,7 +30,7 @@ export default function SessionDetail() {
         if (activo) setSesion(data)
       })
       .catch(() => {
-        if (activo) setError('No se pudo cargar el detalle de la sesion')
+        if (activo) setError('No se pudo cargar el detalle de la sesión')
       })
     return () => {
       activo = false
@@ -45,15 +47,15 @@ export default function SessionDetail() {
   }
 
   if (!sesion) {
-    return <p className="page-container">Cargando...</p>
+    return <LoadingSpinner />
   }
 
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>Detalle de la sesion</h1>
+        <h1>Detalle de la sesión</h1>
         <Link className="btn-primary" to={`/sesiones/${id}/editar`}>
-          Editar
+          <IconEditar /> Editar
         </Link>
       </div>
 

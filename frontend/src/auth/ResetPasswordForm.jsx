@@ -17,15 +17,15 @@ export default function ResetPasswordForm() {
     setError('')
 
     if (!token) {
-      setError('El enlace no es valido')
+      setError('El enlace no es válido')
       return
     }
     if (password.length < 6) {
-      setError('La contrasena debe tener al menos 6 caracteres')
+      setError('La contraseña debe tener al menos 6 caracteres')
       return
     }
     if (password !== confirmar) {
-      setError('Las contrasenas no coinciden')
+      setError('Las contraseñas no coinciden')
       return
     }
 
@@ -34,7 +34,7 @@ export default function ResetPasswordForm() {
       await restablecerPassword({ token, password })
       setListo(true)
     } catch (err) {
-      setError(err.response?.data?.mensaje || 'No se pudo actualizar la contrasena')
+      setError(err.response?.data?.mensaje || 'No se pudo actualizar la contraseña')
     } finally {
       setCargando(false)
     }
@@ -43,10 +43,10 @@ export default function ResetPasswordForm() {
   if (listo) {
     return (
       <div className="auth-form">
-        <h1>Contrasena actualizada</h1>
-        <p className="auth-info">Ya puedes iniciar sesion con tu nueva contrasena.</p>
+        <h1>Contraseña actualizada</h1>
+        <p className="auth-info">Ya puedes iniciar sesión con tu nueva contraseña.</p>
         <p className="auth-switch">
-          <Link to="/login">Ir a iniciar sesion</Link>
+          <Link to="/login">Ir a iniciar sesión</Link>
         </p>
       </div>
     )
@@ -54,9 +54,9 @@ export default function ResetPasswordForm() {
 
   return (
     <form className="auth-form" onSubmit={handleSubmit}>
-      <h1>Nueva contrasena</h1>
+      <h1>Nueva contraseña</h1>
 
-      <label htmlFor="password">Nueva contrasena</label>
+      <label htmlFor="password">Nueva contraseña</label>
       <div className="password-field">
         <input
           id="password"
@@ -69,13 +69,13 @@ export default function ResetPasswordForm() {
           type="button"
           className="password-toggle"
           onClick={() => setMostrarPassword((valor) => !valor)}
-          aria-label={mostrarPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+          aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
         >
           {mostrarPassword ? 'Ocultar' : 'Mostrar'}
         </button>
       </div>
 
-      <label htmlFor="confirmar">Confirmar contrasena</label>
+      <label htmlFor="confirmar">Confirmar contraseña</label>
       <input
         id="confirmar"
         type={mostrarPassword ? 'text' : 'password'}
@@ -87,11 +87,11 @@ export default function ResetPasswordForm() {
       {error && <p className="auth-error">{error}</p>}
 
       <button type="submit" disabled={cargando}>
-        {cargando ? 'Guardando...' : 'Guardar contrasena'}
+        {cargando ? 'Guardando...' : 'Guardar contraseña'}
       </button>
 
       <p className="auth-switch">
-        <Link to="/login">Volver a iniciar sesion</Link>
+        <Link to="/login">Volver a iniciar sesión</Link>
       </p>
     </form>
   )

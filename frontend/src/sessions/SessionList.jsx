@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { eliminarSesion, listarSesiones } from '../api/sesionService'
+import LoadingSpinner from '../components/LoadingSpinner'
+import { IconVerDetalle, IconEditar, IconEliminar } from '../components/icons'
+import ConfirmDialog from '../components/ConfirmDialog'
 
 function formatearFecha(fechaIso) {
   const fecha = new Date(fechaIso)
@@ -19,6 +22,7 @@ export default function SessionList() {
   const [fin, setFin] = useState('')
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(true)
+  const [pendienteEliminar, setPendienteEliminar] = useState(null)
 
   async function cargar(filtro = {}) {
     setCargando(true)
@@ -48,13 +52,14 @@ export default function SessionList() {
     cargar()
   }
 
-  async function handleEliminar(id) {
-    if (!window.confirm('¿Eliminar esta sesion de entrenamiento?')) return
+  async function confirmarEliminar() {
+    const id = pendienteEliminar
+    setPendienteEliminar(null)
     try {
       await eliminarSesion(id)
       cargar({ inicio: inicio || undefined, fin: fin || undefined })
     } catch (err) {
-      setError(err.response?.data?.mensaje || 'No se pudo eliminar la sesion')
+      setError(err.response?.data?.mensaje || 'No se pudo eliminar la sesión')
     }
   }
 
@@ -63,7 +68,7 @@ export default function SessionList() {
       <div className="page-header">
         <h1>Historial de entrenamientos</h1>
         <Link className="btn-primary" to="/sesiones/nueva">
-          + Nueva sesion
+          + Nueva sesión
         </Link>
       </div>
 
@@ -90,7 +95,7 @@ export default function SessionList() {
       {error && <p className="auth-error">{error}</p>}
 
       {cargando ? (
-        <p>Cargando...</p>
+        <LoadingSpinner contenedor={false} />
       ) : sesiones.length === 0 ? (
         <p>No hay sesiones registradas para el periodo seleccionado.</p>
       ) : (
@@ -110,15 +115,28 @@ export default function SessionList() {
                 <td>{sesion.ejercicios.map((e) => e.nombreEjercicio).join(', ')}</td>
                 <td>{sesion.notas}</td>
                 <td className="table-actions">
-                  <Link to={`/sesiones/${sesion.id}`}>Ver detalle</Link>
-                  <Link to={`/sesiones/${sesion.id}/editar`}>Editar</Link>
-                  <button onClick={() => handleEliminar(sesion.id)}>Eliminar</button>
+                  <Link to={`/sesiones/${sesion.id}`}>
+                    <IconVerDetalle /> Ver detalle
+                  </Link>
+                  <Link to={`/sesiones/${sesion.id}/editar`}>
+                    <IconEditar /> Editar
+                  </Link>
+                  <button onClick={() => setPendienteEliminar(sesion.id)}>
+                    <IconEliminar /> Eliminar
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
+
+      <ConfirmDialog
+        abierto={!!pendienteEliminar}
+        mensaje="¿Eliminar esta sesión de entrenamiento?"
+        onConfirmar={confirmarEliminar}
+        onCancelar={() => setPendienteEliminar(null)}
+      />
     </div>
   )
 }

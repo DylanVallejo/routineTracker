@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private static final String MENSAJE_RECUPERACION =
-            "Si el correo esta registrado, te enviamos un enlace para restablecer tu contrasena";
+            "Si el correo está registrado, te enviamos un enlace para restablecer tu contraseña";
 
     private final AuthService authService;
     private final CuentaService cuentaService;
@@ -41,14 +41,14 @@ public class AuthController {
     @PostMapping("/verificar")
     public ResponseEntity<MensajeResponse> verificar(@Valid @RequestBody TokenRequest request) {
         cuentaService.verificar(request.getToken());
-        return ResponseEntity.ok(new MensajeResponse("Cuenta confirmada. Ya puedes iniciar sesion"));
+        return ResponseEntity.ok(new MensajeResponse("Cuenta confirmada. Ya puedes iniciar sesión"));
     }
 
     @PostMapping("/reenviar-verificacion")
     public ResponseEntity<MensajeResponse> reenviarVerificacion(@Valid @RequestBody CorreoRequest request) {
         cuentaService.reenviarVerificacion(request.getCorreo());
         return ResponseEntity.ok(new MensajeResponse(
-                "Si el correo esta registrado y sin confirmar, te enviamos un nuevo enlace"));
+                "Si el correo está registrado y sin confirmar, te enviamos un nuevo enlace"));
     }
 
     @PostMapping("/recuperar")
@@ -60,6 +60,6 @@ public class AuthController {
     @PostMapping("/restablecer")
     public ResponseEntity<MensajeResponse> restablecer(@Valid @RequestBody RestablecerPasswordRequest request) {
         cuentaService.restablecerPassword(request.getToken(), request.getPassword());
-        return ResponseEntity.ok(new MensajeResponse("Contrasena actualizada. Ya puedes iniciar sesion"));
+        return ResponseEntity.ok(new MensajeResponse("Contraseña actualizada. Ya puedes iniciar sesión"));
     }
 }

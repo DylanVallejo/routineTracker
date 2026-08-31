@@ -25,7 +25,7 @@ export default function LoginForm() {
       login(data)
       navigate('/')
     } catch (err) {
-      setError(err.response?.data?.mensaje || 'Correo o contrasena invalidos')
+      setError(err.response?.data?.mensaje || 'Correo o contraseña inválidos')
       setNoVerificado(err.response?.status === 403)
     } finally {
       setCargando(false)
@@ -38,13 +38,13 @@ export default function LoginForm() {
       const data = await reenviarVerificacion(correo)
       setAvisoReenvio(data.mensaje)
     } catch {
-      setAvisoReenvio('No se pudo reenviar el correo, intenta mas tarde')
+      setAvisoReenvio('No se pudo reenviar el correo, intenta más tarde')
     }
   }
 
   return (
     <form className="auth-form" onSubmit={handleSubmit}>
-      <h1>Iniciar sesion</h1>
+      <h1>Iniciar sesión</h1>
 
       <label htmlFor="correo">Correo</label>
       <input
@@ -55,7 +55,7 @@ export default function LoginForm() {
         required
       />
 
-      <label htmlFor="password">Contrasena</label>
+      <label htmlFor="password">Contraseña</label>
       <div className="password-field">
         <input
           id="password"
@@ -68,7 +68,7 @@ export default function LoginForm() {
           type="button"
           className="password-toggle"
           onClick={() => setMostrarPassword((valor) => !valor)}
-          aria-label={mostrarPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+          aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
         >
           {mostrarPassword ? 'Ocultar' : 'Mostrar'}
         </button>
@@ -77,7 +77,7 @@ export default function LoginForm() {
       {error && <p className="auth-error">{error}</p>}
       {noVerificado && (
         <button type="button" className="auth-link-button" onClick={handleReenviar}>
-          Reenviar correo de confirmacion
+          Reenviar correo de confirmación
         </button>
       )}
       {avisoReenvio && <p className="auth-info">{avisoReenvio}</p>}
@@ -87,10 +87,10 @@ export default function LoginForm() {
       </button>
 
       <p className="auth-switch">
-        <Link to="/recuperar">¿Olvidaste tu contrasena?</Link>
+        <Link to="/recuperar">¿Olvidaste tu contraseña?</Link>
       </p>
       <p className="auth-switch">
-        ¿No tienes cuenta? <Link to="/register">Registrate</Link>
+        ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
       </p>
     </form>
   )

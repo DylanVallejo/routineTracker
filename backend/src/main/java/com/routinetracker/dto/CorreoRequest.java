@@ -8,6 +8,6 @@ import lombok.Data;
 public class CorreoRequest {
 
     @NotBlank(message = "El correo es obligatorio")
-    @Email(message = "El correo no tiene un formato valido")
+    @Email(message = "El correo no tiene un formato válido")
     private String correo;
 }

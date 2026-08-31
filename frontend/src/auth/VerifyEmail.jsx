@@ -15,7 +15,7 @@ export default function VerifyEmail() {
 
     if (!token) {
       setEstado('error')
-      setMensaje('El enlace no es valido')
+      setMensaje('El enlace no es válido')
       return
     }
     verificarCuenta(token)
@@ -31,12 +31,12 @@ export default function VerifyEmail() {
 
   return (
     <div className="auth-form">
-      <h1>Confirmacion de cuenta</h1>
+      <h1>Confirmación de cuenta</h1>
       {estado === 'verificando' && <p className="auth-info">Confirmando tu cuenta...</p>}
       {estado === 'ok' && <p className="auth-info">{mensaje}</p>}
       {estado === 'error' && <p className="auth-error">{mensaje}</p>}
       <p className="auth-switch">
-        <Link to="/login">Ir a iniciar sesion</Link>
+        <Link to="/login">Ir a iniciar sesión</Link>
       </p>
     </div>
   )

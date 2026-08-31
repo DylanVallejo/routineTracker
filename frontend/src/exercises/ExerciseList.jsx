@@ -3,12 +3,16 @@ import { Link } from 'react-router-dom'
 import { eliminarEjercicio, listarEjercicios } from '../api/ejercicioService'
 import { etiquetaGrupoMuscular } from '../constants/gruposMusculares'
 import VideoPlayer from '../components/VideoPlayer'
+import LoadingSpinner from '../components/LoadingSpinner'
+import { IconEditar, IconEliminar } from '../components/icons'
+import ConfirmDialog from '../components/ConfirmDialog'
 
 export default function ExerciseList() {
   const [pagina, setPagina] = useState(0)
   const [datos, setDatos] = useState({ content: [], totalPages: 0 })
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(true)
+  const [pendienteEliminar, setPendienteEliminar] = useState(null)
 
   async function cargar() {
     setCargando(true)
@@ -28,8 +32,9 @@ export default function ExerciseList() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagina])
 
-  async function handleEliminar(id, nombre) {
-    if (!window.confirm(`¿Eliminar el ejercicio "${nombre}"?`)) return
+  async function confirmarEliminar() {
+    const { id } = pendienteEliminar
+    setPendienteEliminar(null)
     try {
       await eliminarEjercicio(id)
       cargar()
@@ -44,7 +49,7 @@ export default function ExerciseList() {
         <h1>Ejercicios</h1>
         <div className="page-header-acciones">
           <Link className="btn-secondary" to="/ejercicios/catalogo">
-            Ver catalogo
+            Ver catálogo
           </Link>
           <Link className="btn-primary" to="/ejercicios/nuevo">
             + Nuevo ejercicio
@@ -55,13 +60,13 @@ export default function ExerciseList() {
       {error && <p className="auth-error">{error}</p>}
 
       {cargando ? (
-        <p>Cargando...</p>
+        <LoadingSpinner contenedor={false} />
       ) : datos.content.length === 0 ? (
         <div className="dashboard-vacio">
-          <p>Aun no tienes ejercicios registrados.</p>
-          <p>Elige ejercicios predefinidos con video demostrativo desde el catalogo, o crea uno propio.</p>
+          <p>Aún no tienes ejercicios registrados.</p>
+          <p>Elige ejercicios predefinidos con video demostrativo desde el catálogo, o crea uno propio.</p>
           <Link className="btn-primary" to="/ejercicios/catalogo">
-            Ver catalogo de ejercicios
+            Ver catálogo de ejercicios
           </Link>
         </div>
       ) : (
@@ -71,7 +76,7 @@ export default function ExerciseList() {
               <tr>
                 <th>Nombre</th>
                 <th>Grupo muscular</th>
-                <th>Descripcion</th>
+                <th>Descripción</th>
                 <th>Video</th>
                 <th>Acciones</th>
               </tr>
@@ -90,9 +95,11 @@ export default function ExerciseList() {
                     )}
                   </td>
                   <td className="table-actions">
-                    <Link to={`/ejercicios/${ejercicio.id}/editar`}>Editar</Link>
-                    <button onClick={() => handleEliminar(ejercicio.id, ejercicio.nombre)}>
-                      Eliminar
+                    <Link to={`/ejercicios/${ejercicio.id}/editar`}>
+                      <IconEditar /> Editar
+                    </Link>
+                    <button onClick={() => setPendienteEliminar({ id: ejercicio.id, nombre: ejercicio.nombre })}>
+                      <IconEliminar /> Eliminar
                     </button>
                   </td>
                 </tr>
@@ -105,7 +112,7 @@ export default function ExerciseList() {
               Anterior
             </button>
             <span>
-              Pagina {pagina + 1} de {Math.max(datos.totalPages, 1)}
+              Página {pagina + 1} de {Math.max(datos.totalPages, 1)}
             </span>
             <button
               disabled={pagina + 1 >= datos.totalPages}
@@ -116,6 +123,13 @@ export default function ExerciseList() {
           </div>
         </>
       )}
+
+      <ConfirmDialog
+        abierto={!!pendienteEliminar}
+        mensaje={`¿Eliminar el ejercicio "${pendienteEliminar?.nombre}"?`}
+        onConfirmar={confirmarEliminar}
+        onCancelar={() => setPendienteEliminar(null)}
+      />
     </div>
   )
 }

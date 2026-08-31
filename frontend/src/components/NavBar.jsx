@@ -1,5 +1,13 @@
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
+import {
+  IconInicio,
+  IconEjercicios,
+  IconSesiones,
+  IconAnalisis,
+  IconProgreso,
+  IconCerrarSesion,
+} from './icons'
 
 function navLinkClass({ isActive }) {
   return isActive ? 'navbar-link-active' : undefined
@@ -15,24 +23,26 @@ export default function NavBar() {
       </div>
       <div className="navbar-links">
         <NavLink to="/" end className={navLinkClass}>
-          Inicio
+          <IconInicio /> Inicio
         </NavLink>
         <NavLink to="/ejercicios" className={navLinkClass}>
-          Ejercicios
+          <IconEjercicios /> Ejercicios
         </NavLink>
         <NavLink to="/sesiones" className={navLinkClass}>
-          Sesiones
+          <IconSesiones /> Sesiones
         </NavLink>
         <NavLink to="/analisis" className={navLinkClass}>
-          Analisis
+          <IconAnalisis /> Análisis
         </NavLink>
         <NavLink to="/progreso" className={navLinkClass}>
-          Progreso
+          <IconProgreso /> Progreso
         </NavLink>
       </div>
       <div className="navbar-user">
         <span>{usuario?.nombre}</span>
-        <button onClick={logout}>Cerrar sesion</button>
+        <button onClick={logout}>
+          <IconCerrarSesion /> Cerrar sesión
+        </button>
       </div>
     </nav>
   )

@@ -16,7 +16,7 @@ public class SesionRequest {
 
     private String notas;
 
-    @NotEmpty(message = "Debes agregar al menos un ejercicio a la sesion")
+    @NotEmpty(message = "Debes agregar al menos un ejercicio a la sesión")
     @Valid
     private List<SesionEjercicioRequest> ejercicios;
 }

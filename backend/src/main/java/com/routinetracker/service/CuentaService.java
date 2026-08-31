@@ -89,9 +89,9 @@ public class CuentaService {
         Usuario usuario = encontrado.get();
         String token = crearToken(usuario, TipoToken.RECUPERACION, recuperacionMinutos);
         String enlace = frontendUrl + "/restablecer?token=" + token;
-        emailService.enviar(usuario.getCorreo(), "Restablece tu contrasena de Routine Tracker",
+        emailService.enviar(usuario.getCorreo(), "Restablece tu contraseña de Routine Tracker",
                 "Hola " + usuario.getNombre() + ",\n\n"
-                        + "Para elegir una nueva contrasena ingresa al siguiente enlace:\n" + enlace + "\n\n"
+                        + "Para elegir una nueva contraseña ingresa al siguiente enlace:\n" + enlace + "\n\n"
                         + "El enlace vence en " + recuperacionMinutos + " minutos. Si no lo solicitaste, ignora este correo.");
     }
 

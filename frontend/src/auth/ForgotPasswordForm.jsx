@@ -25,8 +25,8 @@ export default function ForgotPasswordForm() {
 
   return (
     <form className="auth-form" onSubmit={handleSubmit}>
-      <h1>Recuperar contrasena</h1>
-      <p className="auth-info">Ingresa tu correo y te enviaremos un enlace para elegir una nueva contrasena.</p>
+      <h1>Recuperar contraseña</h1>
+      <p className="auth-info">Ingresa tu correo y te enviaremos un enlace para elegir una nueva contraseña.</p>
 
       <label htmlFor="correo">Correo</label>
       <input
@@ -45,7 +45,7 @@ export default function ForgotPasswordForm() {
       </button>
 
       <p className="auth-switch">
-        <Link to="/login">Volver a iniciar sesion</Link>
+        <Link to="/login">Volver a iniciar sesión</Link>
       </p>
     </form>
   )

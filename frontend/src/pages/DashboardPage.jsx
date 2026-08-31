@@ -4,6 +4,7 @@ import { useAuth } from '../auth/AuthContext'
 import { listarSesiones } from '../api/sesionService'
 import { listarEjercicios } from '../api/ejercicioService'
 import { etiquetaGrupoMuscular } from '../constants/gruposMusculares'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 function formatearFechaLarga(fechaIso) {
   const fecha = new Date(fechaIso)
@@ -28,7 +29,7 @@ function diasDesde(fechaIso) {
   const dias = Math.round((inicioHoy - inicioFecha) / (1000 * 60 * 60 * 24))
   if (dias <= 0) return 'Hoy'
   if (dias === 1) return 'Ayer'
-  return `Hace ${dias} dias`
+  return `Hace ${dias} días`
 }
 
 export default function DashboardPage() {
@@ -65,20 +66,20 @@ export default function DashboardPage() {
       <div className="page-header">
         <h1>Hola, {usuario?.nombre}</h1>
         <Link className="btn-primary" to="/sesiones/nueva">
-          + Nueva sesion
+          + Nueva sesión
         </Link>
       </div>
 
       {error && <p className="auth-error">{error}</p>}
 
       {cargando ? (
-        <p>Cargando...</p>
+        <LoadingSpinner contenedor={false} />
       ) : sesiones.length === 0 ? (
         <div className="dashboard-vacio">
-          <p>Aun no registras entrenamientos.</p>
+          <p>Aún no registras entrenamientos.</p>
           <p>
             Empieza por dar de alta tus <Link to="/ejercicios">ejercicios</Link> y luego{' '}
-            <Link to="/sesiones/nueva">registra tu primera sesion</Link>.
+            <Link to="/sesiones/nueva">registra tu primera sesión</Link>.
           </p>
         </div>
       ) : (
@@ -90,17 +91,17 @@ export default function DashboardPage() {
             </div>
             <div className="stat-card">
               <span className="stat-valor">{totalEjercicios ?? '-'}</span>
-              <span className="stat-etiqueta">Ejercicios en tu catalogo</span>
+              <span className="stat-etiqueta">Ejercicios en tu catálogo</span>
             </div>
             <div className="stat-card">
               <span className="stat-valor">{diasDesde(ultimaSesion.fecha)}</span>
-              <span className="stat-etiqueta">Ultimo entrenamiento</span>
+              <span className="stat-etiqueta">Último entrenamiento</span>
             </div>
           </div>
 
           <section className="dashboard-seccion">
             <div className="page-header">
-              <h2>Ultimo entrenamiento</h2>
+              <h2>Último entrenamiento</h2>
               <Link to={`/sesiones/${ultimaSesion.id}`}>Ver detalle</Link>
             </div>
             <p className="session-detail-fecha">{formatearFechaLarga(ultimaSesion.fecha)}</p>

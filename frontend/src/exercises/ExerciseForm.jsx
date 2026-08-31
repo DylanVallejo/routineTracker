@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { crearEjercicio, actualizarEjercicio, obtenerEjercicio } from '../api/ejercicioService'
 import { GRUPOS_MUSCULARES } from '../constants/gruposMusculares'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 export default function ExerciseForm() {
   const { id } = useParams()
@@ -57,7 +58,7 @@ export default function ExerciseForm() {
     }
   }
 
-  if (cargando) return <p className="page-container">Cargando...</p>
+  if (cargando) return <LoadingSpinner />
 
   return (
     <div className="page-container">
@@ -86,7 +87,7 @@ export default function ExerciseForm() {
           ))}
         </select>
 
-        <label htmlFor="descripcion">Descripcion</label>
+        <label htmlFor="descripcion">Descripción</label>
         <textarea
           id="descripcion"
           value={descripcion}

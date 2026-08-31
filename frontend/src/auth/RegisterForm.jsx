@@ -16,7 +16,7 @@ export default function RegisterForm() {
     setError('')
 
     if (password.length < 6) {
-      setError('La contrasena debe tener al menos 6 caracteres')
+      setError('La contraseña debe tener al menos 6 caracteres')
       return
     }
 
@@ -37,10 +37,10 @@ export default function RegisterForm() {
         <h1>Revisa tu correo</h1>
         <p className="auth-info">
           Te enviamos un enlace a <strong>{correo}</strong> para confirmar tu cuenta.
-          Abrilo para activarla y poder iniciar sesion.
+          Abrilo para activarla y poder iniciar sesión.
         </p>
         <p className="auth-switch">
-          <Link to="/login">Volver a iniciar sesion</Link>
+          <Link to="/login">Volver a iniciar sesión</Link>
         </p>
       </div>
     )
@@ -68,7 +68,7 @@ export default function RegisterForm() {
         required
       />
 
-      <label htmlFor="password">Contrasena</label>
+      <label htmlFor="password">Contraseña</label>
       <div className="password-field">
         <input
           id="password"
@@ -81,7 +81,7 @@ export default function RegisterForm() {
           type="button"
           className="password-toggle"
           onClick={() => setMostrarPassword((valor) => !valor)}
-          aria-label={mostrarPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+          aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
         >
           {mostrarPassword ? 'Ocultar' : 'Mostrar'}
         </button>
@@ -94,7 +94,7 @@ export default function RegisterForm() {
       </button>
 
       <p className="auth-switch">
-        ¿Ya tienes cuenta? <Link to="/login">Inicia sesion</Link>
+        ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
       </p>
     </form>
   )

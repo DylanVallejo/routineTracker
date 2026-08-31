@@ -68,7 +68,7 @@ public class GlobalExceptionHandler {
         String mensaje = ex.getBindingResult().getFieldErrors().stream()
                 .findFirst()
                 .map(error -> error.getDefaultMessage())
-                .orElse("Datos invalidos");
+                .orElse("Datos inválidos");
         return buildResponse(HttpStatus.BAD_REQUEST, mensaje);
     }
 

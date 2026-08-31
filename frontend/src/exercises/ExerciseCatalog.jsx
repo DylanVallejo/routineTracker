@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { agregarEjercicioDesdeCatalogo, listarCatalogoEjercicios } from '../api/ejercicioService'
 import { etiquetaGrupoMuscular } from '../constants/gruposMusculares'
 import VideoPlayer from '../components/VideoPlayer'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 export default function ExerciseCatalog() {
   const [catalogo, setCatalogo] = useState([])
@@ -15,7 +16,7 @@ export default function ExerciseCatalog() {
   useEffect(() => {
     listarCatalogoEjercicios()
       .then(setCatalogo)
-      .catch(() => setError('No se pudo cargar el catalogo de ejercicios'))
+      .catch(() => setError('No se pudo cargar el catálogo de ejercicios'))
       .finally(() => setCargando(false))
   }, [])
 
@@ -26,7 +27,7 @@ export default function ExerciseCatalog() {
     try {
       await agregarEjercicioDesdeCatalogo(item.id)
       setAgregados((prev) => new Set(prev).add(item.id))
-      setMensaje(`"${item.nombre}" se agrego a tus ejercicios`)
+      setMensaje(`"${item.nombre}" se agregó a tus ejercicios`)
     } catch (err) {
       setError(err.response?.data?.mensaje || 'No se pudo agregar el ejercicio')
     } finally {
@@ -44,7 +45,7 @@ export default function ExerciseCatalog() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>Catalogo de ejercicios</h1>
+        <h1>Catálogo de ejercicios</h1>
         <Link className="btn-secondary" to="/ejercicios">
           Volver a mis ejercicios
         </Link>
@@ -59,7 +60,7 @@ export default function ExerciseCatalog() {
       {mensaje && <p className="auth-info">{mensaje}</p>}
 
       {cargando ? (
-        <p>Cargando...</p>
+        <LoadingSpinner contenedor={false} />
       ) : (
         Array.from(grupos.entries()).map(([grupo, items]) => (
           <section key={grupo} className="catalogo-grupo">

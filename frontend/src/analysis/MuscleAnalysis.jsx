@@ -14,9 +14,11 @@ import { GRUPOS_MUSCULARES, etiquetaGrupoMuscular } from '../constants/gruposMus
 import { PERIODOS, calcularRangoPeriodo } from '../constants/periodos'
 import { ZONAS_VOLUMEN, TOPE_GRAFICO, clasificarVolumen } from '../constants/zonasVolumen'
 import { bandasPlugin } from '../charts/bandasPlugin'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
+const ACENTO = '#d33b36'
 const EXITO = '#409d48'
 const ALERTA = '#c53637'
 
@@ -45,7 +47,7 @@ export default function MuscleAnalysis() {
         setDatos(resultado)
         setDatosVolumen(resultadoVolumen)
       } catch (err) {
-        if (activo) setError(err.response?.data?.mensaje || 'No se pudo cargar el analisis muscular')
+        if (activo) setError(err.response?.data?.mensaje || 'No se pudo cargar el análisis muscular')
       } finally {
         if (activo) setCargando(false)
       }
@@ -102,7 +104,7 @@ export default function MuscleAnalysis() {
       {
         label: 'Sets por semana',
         data: volumenFiltrado.map((d) => d.setsPorSemana),
-        backgroundColor: '#3a6ea5',
+        backgroundColor: ACENTO,
         borderRadius: 2,
       },
     ],
@@ -131,7 +133,7 @@ export default function MuscleAnalysis() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1>Analisis de grupos musculares</h1>
+        <h1>Análisis de grupos musculares</h1>
       </div>
 
       <div className="filter-bar">
@@ -162,7 +164,7 @@ export default function MuscleAnalysis() {
       {error && <p className="auth-error">{error}</p>}
 
       {cargando ? (
-        <p>Cargando...</p>
+        <LoadingSpinner contenedor={false} />
       ) : (
         <>
           {grupoMuscular === 'TODOS' && grupoMenosTrabajado && (
@@ -199,7 +201,7 @@ export default function MuscleAnalysis() {
               className="info-toggle"
               onClick={() => setMostrarInfoVolumen((valor) => !valor)}
               aria-expanded={mostrarInfoVolumen}
-              aria-label="Que significa MV, MEV, MAV y MRV"
+              aria-label="Qué significa MV, MEV, MAV y MRV"
             >
               i
             </button>
@@ -208,30 +210,30 @@ export default function MuscleAnalysis() {
           {mostrarInfoVolumen && (
             <div className="info-panel">
               <p>
-                Estas siglas indican cuantas series ("sets") por semana necesita un grupo muscular
-                para crecer, segun la ciencia del entrenamiento de fuerza:
+                Estas siglas indican cuántas series ("sets") por semana necesita un grupo muscular
+                para crecer, según la ciencia del entrenamiento de fuerza:
               </p>
               <ul>
                 <li>
-                  <strong>MV</strong> (Volumen de mantenimiento): lo minimo para no perder musculo,
+                  <strong>MV</strong> (Volumen de mantenimiento): lo mínimo para no perder músculo,
                   sin buscar crecer.
                 </li>
                 <li>
-                  <strong>MEV</strong> (Volumen minimo efectivo): a partir de aqui el musculo
+                  <strong>MEV</strong> (Volumen mínimo efectivo): a partir de aquí el músculo
                   empieza a crecer.
                 </li>
                 <li>
-                  <strong>MAV</strong> (Volumen adaptativo maximo): el rango donde mas crece la
-                  mayoria de personas.
+                  <strong>MAV</strong> (Volumen adaptativo máximo): el rango donde más crece la
+                  mayoría de personas.
                 </li>
                 <li>
-                  <strong>MRV</strong> (Volumen maximo recuperable): el limite antes de que el
+                  <strong>MRV</strong> (Volumen máximo recuperable): el límite antes de que el
                   cuerpo ya no pueda recuperarse a tiempo entre entrenamientos.
                 </li>
               </ul>
               <p>
                 Son valores generales de referencia (no personalizados a tu experiencia o
-                genetica), pensados para orientar cuantas series por semana conviene sumar por
+                genética), pensados para orientar cuántas series por semana conviene sumar por
                 grupo muscular.
               </p>
             </div>

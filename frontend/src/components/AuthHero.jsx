@@ -5,7 +5,7 @@ const FRASES = [
   'Cumple tus metas',
   'Registra tu progreso',
   'Analiza tus resultados',
-  'Supera tus limites',
+  'Supera tus límites',
 ]
 
 export default function AuthHero() {

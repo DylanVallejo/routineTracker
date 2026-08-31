@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { crearSesion, actualizarSesion, obtenerSesion } from '../api/sesionService'
 import { listarEjercicios } from '../api/ejercicioService'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 function fechaActualParaInput() {
   const ahora = new Date()
@@ -49,7 +50,7 @@ export default function SessionForm() {
           )
         }
       } catch {
-        if (activo) setError('No se pudieron cargar los datos de la sesion')
+        if (activo) setError('No se pudieron cargar los datos de la sesión')
       } finally {
         if (activo) setCargando(false)
       }
@@ -101,16 +102,16 @@ export default function SessionForm() {
       }
       navigate('/sesiones')
     } catch (err) {
-      setError(err.response?.data?.mensaje || 'No se pudo guardar la sesion')
+      setError(err.response?.data?.mensaje || 'No se pudo guardar la sesión')
     }
   }
 
-  if (cargando) return <p className="page-container">Cargando...</p>
+  if (cargando) return <LoadingSpinner />
 
   return (
     <div className="page-container">
       <form className="auth-form session-form" onSubmit={handleSubmit}>
-        <h1>{esEdicion ? 'Editar sesion' : 'Nueva sesion'}</h1>
+        <h1>{esEdicion ? 'Editar sesión' : 'Nueva sesión'}</h1>
 
         <label htmlFor="fecha">Fecha y hora</label>
         <input
@@ -132,7 +133,7 @@ export default function SessionForm() {
         </p>
         {ejerciciosDisponibles.length === 0 ? (
           <p>
-            No tienes ejercicios registrados. Crea uno primero en la seccion Ejercicios.
+            No tienes ejercicios registrados. Crea uno primero en la sección Ejercicios.
           </p>
         ) : (
           filas.map((fila, indice) => (
@@ -191,7 +192,7 @@ export default function SessionForm() {
 
         {error && <p className="auth-error">{error}</p>}
 
-        <button type="submit">{esEdicion ? 'Guardar cambios' : 'Registrar sesion'}</button>
+        <button type="submit">{esEdicion ? 'Guardar cambios' : 'Registrar sesión'}</button>
       </form>
     </div>
   )
