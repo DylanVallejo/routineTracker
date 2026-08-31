@@ -83,9 +83,61 @@ flowchart TD
 - **Análisis muscular** — frecuencia de entrenamiento por grupo muscular y volumen semanal (sets) contra referencias MEV/MAV/MRV, filtrable por período y grupo.
 - **Progreso** — evolución de peso/repeticiones por ejercicio a lo largo del tiempo, con máximos y mínimos destacados.
 
+## Lógica de negocio y cálculos
+
+Detalle de cómo se calculan las métricas y qué reglas aplica el backend, más allá de lo que se ve en pantalla.
+
+### Frecuencia por grupo muscular (Análisis)
+
+Cuenta **sesiones distintas** en las que aparece cada grupo muscular, no filas de ejercicio: una sesión con tres ejercicios de Pecho suma 1 a la frecuencia de Pecho, no 3. Esto evita que repetir ejercicios de un mismo grupo dentro de una sesión (algo normal en un entrenamiento real) infle artificialmente el conteo. El "grupo muscular menos trabajado" destacado en rojo es simplemente el mínimo entre los 10 grupos en el período seleccionado.
+
+### Volumen semanal (sets) y zonas MEV/MAV/MRV
+
+```
+sets_por_semana = series_totales_del_grupo_en_el_periodo / semanas_del_periodo
+semanas_del_periodo = max(dias_del_periodo / 7, 1)
+```
+
+El resultado se clasifica en 5 zonas de referencia (basadas en la ciencia del entrenamiento de fuerza, no personalizadas):
+
+| Zona | Rango (sets/semana) | Color de barra |
+|---|---|---|
+| Insuficiente | < 6 (MV) | Rojo |
+| Mantenimiento | 6 – 10 (MV–MEV) | Amarillo |
+| Óptimo | 10 – 20 (MEV–MAV) | Verde |
+| Cerca del límite | 20 – 25 (MAV–MRV) | Amarillo |
+| Riesgo de sobreentrenamiento | > 25 (MRV) | Rojo |
+
+Cada barra del gráfico toma el color de la zona en la que cae su valor (no un color fijo), coherente con las bandas de fondo. El filtro de fechas de esta sección es **independiente** del filtro de la gráfica de frecuencia de arriba — por defecto ambos usan los últimos 30 días, pero cambiar uno no afecta al otro.
+
+### Progreso por ejercicio
+
+Para el ejercicio y la métrica elegidos (peso o repeticiones), se listan los puntos en el rango de fechas ordenados cronológicamente y se destacan el máximo (verde) y el mínimo (rojo). Cuando la métrica es repeticiones, se dibujan dos bandas de referencia sobre el gráfico: hipertrofia (6-12 reps) y resistencia (13-20 reps).
+
+### Rangos válidos de series y repeticiones
+
+Al registrar una sesión, el backend valida `series` entre 1 y 6, y `repeticiones` entre 1 y 20 — la unión de los rangos habituales de hipertrofia (3-5 series × 6-12 reps) y resistencia (2-4 series × 13-20 reps). No se valida un rango específico según el ejercicio, solo el rango combinado.
+
+### Sugerencia de entrenamiento (panel de inicio)
+
+El dashboard reutiliza el mismo cálculo de frecuencia de los últimos 30 días para sugerir qué grupo muscular entrenar: si no todos los grupos tienen la misma frecuencia, sugiere el de menor frecuencia. Si todos están parejos, no muestra ninguna sugerencia.
+
+### Reglas de integridad de datos
+
+- **Ejercicios por usuario**: cada ejercicio pertenece a quien lo creó (o lo agregó desde el catálogo); nadie ve ni puede referenciar ejercicios de otra cuenta. El nombre debe ser único por usuario, no globalmente.
+- **Ejercicio en uso**: no se puede eliminar un ejercicio que esté asociado a una o más sesiones (409) — hay que editar o borrar esas sesiones primero.
+- **Fecha de sesión**: no puede ser futura.
+
+### Verificación de cuenta y recuperación de contraseña
+
+- Token aleatorio de 32 bytes (`SecureRandom`), de un solo uso. Verificación de cuenta expira en 24 horas; recuperación de contraseña en 30 minutos.
+- Límite de reenvío: 60 segundos de espera entre solicitudes y máximo 3 por ventana de 15 minutos, para evitar abuso.
+- La recuperación de contraseña siempre responde el mismo mensaje genérico exista o no la cuenta (anti-enumeración de correos).
+- Si el registro se reintenta con un correo que ya existe pero no está verificado, se reenvía el correo de verificación en vez de bloquear con error — así una cuenta que quedó a medio verificar (por ejemplo si el correo nunca llegó) se puede recuperar sin soporte manual.
+
 ## Stack
 
-- **Backend**: Java 17, Spring Boot 3.3, Spring Security + JWT, Spring Data JPA, Spring Mail
+- **Backend**: Java 17, Spring Boot 3.3, Spring Security + JWT, Spring Data JPA
 - **Frontend**: React 18, Vite, React Router, Axios, Chart.js
 - **Base de datos**: MySQL 8
 
