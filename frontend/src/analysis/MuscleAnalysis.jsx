@@ -354,7 +354,7 @@ export default function MuscleAnalysis() {
               onClick={() => moverSemanaVolumen(-1)}
               aria-label="Retroceder una semana"
             >
-              ← Semana anterior
+              <span className="flecha">←</span> Semana anterior
             </button>
             <button
               type="button"
@@ -362,15 +362,11 @@ export default function MuscleAnalysis() {
               disabled={!puedeAvanzarSemanaVolumen}
               aria-label="Avanzar una semana"
             >
-              Semana siguiente →
+              Semana siguiente <span className="flecha">→</span>
             </button>
           </span>
         )}
       </div>
-
-      <p className="analisis-nota">
-        Este período es independiente del filtro de arriba — cambiar uno no afecta al otro.
-      </p>
 
       {esPersonalizado && !rangoVolumenListo && (
         <p className="analisis-nota">Elegí "Desde" y "Hasta" para ver ese rango.</p>
