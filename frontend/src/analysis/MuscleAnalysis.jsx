@@ -10,6 +10,7 @@ import {
 } from 'chart.js'
 import { Bar } from 'react-chartjs-2'
 import { obtenerAnalisisMuscular, obtenerAnalisisVolumen } from '../api/analisisService'
+import { listarSesiones } from '../api/sesionService'
 import { GRUPOS_MUSCULARES, etiquetaGrupoMuscular } from '../constants/gruposMusculares'
 import { PERIODOS, calcularRangoPeriodo } from '../constants/periodos'
 import { ZONAS_VOLUMEN, TOPE_GRAFICO, clasificarVolumen, colorPorVolumen } from '../constants/zonasVolumen'
@@ -18,15 +19,28 @@ import LoadingSpinner from '../components/LoadingSpinner'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
-const EXITO = '#409d48'
-const ALERTA = '#c53637'
+const NEUTRO = '#847f7c'
 
 const FRECUENCIA_MINIMA_SEMANAL = 2
 
-function calcularFrecuenciaMinima(periodo) {
-  const dias = Number(periodo)
-  if (!dias) return null
-  return Math.round((FRECUENCIA_MINIMA_SEMANAL * dias) / 7)
+function diasDesde(fechaIso) {
+  const inicio = new Date(`${fechaIso}T00:00:00`)
+  const hoy = new Date()
+  hoy.setHours(0, 0, 0, 0)
+  return Math.round((hoy - inicio) / (1000 * 60 * 60 * 24)) + 1
+}
+
+function calcularFrecuenciaMinima(periodo, fechaMasAntigua) {
+  let dias
+  if (periodo === 'todo') {
+    if (!fechaMasAntigua) return null
+    dias = diasDesde(fechaMasAntigua)
+  } else {
+    dias = Number(periodo)
+    if (!dias) return null
+  }
+  const semanas = Math.max(dias / 7, 1)
+  return Math.floor(FRECUENCIA_MINIMA_SEMANAL * semanas)
 }
 
 function formatearFechaCorta(fechaIso) {
@@ -60,6 +74,24 @@ export default function MuscleAnalysis() {
   const [errorVolumen, setErrorVolumen] = useState('')
   const [cargando, setCargando] = useState(true)
   const [cargandoVolumen, setCargandoVolumen] = useState(true)
+  const [fechaMasAntigua, setFechaMasAntigua] = useState(undefined)
+
+  useEffect(() => {
+    if (periodo !== 'todo' || fechaMasAntigua !== undefined) return
+    let activo = true
+    listarSesiones().then((sesiones) => {
+      if (!activo) return
+      if (sesiones.length === 0) {
+        setFechaMasAntigua(null)
+        return
+      }
+      const fechas = sesiones.map((s) => s.fecha.slice(0, 10))
+      setFechaMasAntigua(fechas.reduce((min, f) => (f < min ? f : min)))
+    })
+    return () => {
+      activo = false
+    }
+  }, [periodo, fechaMasAntigua])
 
   useEffect(() => {
     let activo = true
@@ -140,11 +172,18 @@ export default function MuscleAnalysis() {
     grupoMuscular === 'TODOS' ? datos : datos.filter((d) => d.grupoMuscular === grupoMuscular)
 
   const frecuencias = datosFiltrados.map((d) => d.frecuencia)
-  const frecuenciaMinima = calcularFrecuenciaMinima(periodo)
+  const frecuenciaMinima = calcularFrecuenciaMinima(periodo, fechaMasAntigua)
   const minimo = frecuencias.length > 0 ? Math.min(...frecuencias) : 0
   const grupoMenosTrabajado = datosFiltrados.find((d) => d.frecuencia === minimo)
   const gruposBajoMinimo =
     frecuenciaMinima != null ? datosFiltrados.filter((d) => d.frecuencia < frecuenciaMinima) : []
+
+  const rangoFrecuencia =
+    periodo === 'todo'
+      ? fechaMasAntigua
+        ? { inicio: fechaMasAntigua, fin: hoyISO() }
+        : {}
+      : calcularRangoPeriodo(periodo)
 
   const chartData = {
     labels: datosFiltrados.map((d) => etiquetaGrupoMuscular(d.grupoMuscular)),
@@ -152,10 +191,7 @@ export default function MuscleAnalysis() {
       {
         label: 'Veces entrenado',
         data: frecuencias,
-        backgroundColor: datosFiltrados.map((d) => {
-          const bajoMinimo = frecuenciaMinima != null ? d.frecuencia < frecuenciaMinima : d.frecuencia === minimo
-          return bajoMinimo ? ALERTA : EXITO
-        }),
+        backgroundColor: NEUTRO,
         borderRadius: 2,
       },
     ],
@@ -228,7 +264,7 @@ export default function MuscleAnalysis() {
             </option>
           ))}
         </select>
-        <span className="periodo-rango">({formatearRango(calcularRangoPeriodo(periodo))})</span>
+        <span className="periodo-rango">({formatearRango(rangoFrecuencia)})</span>
 
         <label htmlFor="grupoMuscular">Grupo muscular</label>
         <select
