@@ -1,8 +1,8 @@
 import axiosClient from './axiosClient'
 
-export function listarEjercicios({ page = 0, size = 10 } = {}) {
+export function listarEjercicios({ page = 0, size = 10, grupoMuscular } = {}) {
   return axiosClient
-    .get('/ejercicios', { params: { page, size } })
+    .get('/ejercicios', { params: { page, size, grupoMuscular } })
     .then((res) => res.data)
 }
 

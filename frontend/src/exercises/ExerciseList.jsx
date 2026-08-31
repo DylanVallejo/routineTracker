@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { eliminarEjercicio, listarEjercicios } from '../api/ejercicioService'
-import { etiquetaGrupoMuscular } from '../constants/gruposMusculares'
+import { GRUPOS_MUSCULARES, etiquetaGrupoMuscular } from '../constants/gruposMusculares'
 import VideoPlayer from '../components/VideoPlayer'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { IconEditar, IconEliminar } from '../components/icons'
@@ -9,6 +9,7 @@ import ConfirmDialog from '../components/ConfirmDialog'
 
 export default function ExerciseList() {
   const [pagina, setPagina] = useState(0)
+  const [grupoMuscular, setGrupoMuscular] = useState('')
   const [datos, setDatos] = useState({ content: [], totalPages: 0 })
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(true)
@@ -18,7 +19,7 @@ export default function ExerciseList() {
     setCargando(true)
     setError('')
     try {
-      const resultado = await listarEjercicios({ page: pagina, size: 10 })
+      const resultado = await listarEjercicios({ page: pagina, size: 10, grupoMuscular: grupoMuscular || undefined })
       setDatos(resultado)
     } catch (err) {
       setError(err.response?.data?.mensaje || 'No se pudo cargar el listado de ejercicios')
@@ -30,7 +31,12 @@ export default function ExerciseList() {
   useEffect(() => {
     cargar()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagina])
+  }, [pagina, grupoMuscular])
+
+  function handleCambiarGrupo(valor) {
+    setPagina(0)
+    setGrupoMuscular(valor)
+  }
 
   async function confirmarEliminar() {
     const { id } = pendienteEliminar
@@ -57,11 +63,27 @@ export default function ExerciseList() {
         </div>
       </div>
 
+      <div className="filter-bar">
+        <label htmlFor="grupoMuscular">Grupo muscular</label>
+        <select
+          id="grupoMuscular"
+          value={grupoMuscular}
+          onChange={(e) => handleCambiarGrupo(e.target.value)}
+        >
+          <option value="">Todos</option>
+          {GRUPOS_MUSCULARES.map((g) => (
+            <option key={g.value} value={g.value}>
+              {g.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {error && <p className="auth-error">{error}</p>}
 
       {cargando ? (
         <LoadingSpinner contenedor={false} />
-      ) : datos.content.length === 0 ? (
+      ) : datos.content.length === 0 && !grupoMuscular ? (
         <div className="dashboard-vacio">
           <p>Aún no tienes ejercicios registrados.</p>
           <p>Elige ejercicios predefinidos con video demostrativo desde el catálogo, o crea uno propio.</p>
@@ -69,6 +91,8 @@ export default function ExerciseList() {
             Ver catálogo de ejercicios
           </Link>
         </div>
+      ) : datos.content.length === 0 ? (
+        <p>No tienes ejercicios de este grupo muscular todavía.</p>
       ) : (
         <>
           <table className="data-table">

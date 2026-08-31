@@ -8,6 +8,7 @@
 
 html {
   overflow-x: clip;
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -561,6 +562,21 @@ a {
   text-transform: uppercase;
 }
 
+.page-header-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  color: var(--color-accent);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color var(--dur-short) var(--ease-out);
+}
+
+.page-header-link:hover {
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+}
+
 /* ---------- Loading spinner ---------- */
 
 .loading-spinner-container {
@@ -568,6 +584,13 @@ a {
   align-items: center;
   justify-content: center;
   min-height: 12rem;
+}
+
+.loading-spinner-inline {
+  display: flex;
+  align-items: center;
+  min-height: 8rem;
+  padding-top: var(--space-md);
 }
 
 .loading-spinner {

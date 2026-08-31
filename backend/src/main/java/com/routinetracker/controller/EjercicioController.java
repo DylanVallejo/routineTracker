@@ -3,6 +3,7 @@ package com.routinetracker.controller;
 import com.routinetracker.dto.EjercicioDefaultResponse;
 import com.routinetracker.dto.EjercicioRequest;
 import com.routinetracker.dto.EjercicioResponse;
+import com.routinetracker.entity.GrupoMuscular;
 import com.routinetracker.service.EjercicioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,8 +40,9 @@ public class EjercicioController {
 
     @GetMapping
     public ResponseEntity<Page<EjercicioResponse>> listar(
-            @PageableDefault(size = 10, sort = "nombre") Pageable pageable) {
-        return ResponseEntity.ok(ejercicioService.listar(pageable));
+            @PageableDefault(size = 10, sort = "nombre") Pageable pageable,
+            @RequestParam(required = false) GrupoMuscular grupoMuscular) {
+        return ResponseEntity.ok(ejercicioService.listar(pageable, grupoMuscular));
     }
 
     @GetMapping("/{id}")

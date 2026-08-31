@@ -7,7 +7,7 @@ export default function LoadingSpinner({ texto = 'Cargando...', contenedor = tru
     </div>
   )
 
-  if (!contenedor) return spinner
+  if (!contenedor) return <div className="loading-spinner-inline">{spinner}</div>
 
   return <div className="page-container loading-spinner-container">{spinner}</div>
 }

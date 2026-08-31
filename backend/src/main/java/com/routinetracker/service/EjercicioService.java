@@ -5,6 +5,7 @@ import com.routinetracker.dto.EjercicioRequest;
 import com.routinetracker.dto.EjercicioResponse;
 import com.routinetracker.entity.Ejercicio;
 import com.routinetracker.entity.EjercicioDefault;
+import com.routinetracker.entity.GrupoMuscular;
 import com.routinetracker.entity.Usuario;
 import com.routinetracker.exception.EjercicioDuplicadoException;
 import com.routinetracker.exception.EjercicioEnUsoException;
@@ -94,9 +95,12 @@ public class EjercicioService {
         return EjercicioResponse.from(ejercicioRepository.save(ejercicio));
     }
 
-    public Page<EjercicioResponse> listar(Pageable pageable) {
+    public Page<EjercicioResponse> listar(Pageable pageable, GrupoMuscular grupoMuscular) {
         Usuario usuario = authenticatedUserProvider.getUsuarioActual();
-        return ejercicioRepository.findByUsuarioId(usuario.getId(), pageable).map(EjercicioResponse::from);
+        Page<Ejercicio> ejercicios = grupoMuscular != null
+                ? ejercicioRepository.findByUsuarioIdAndGrupoMuscular(usuario.getId(), grupoMuscular, pageable)
+                : ejercicioRepository.findByUsuarioId(usuario.getId(), pageable);
+        return ejercicios.map(EjercicioResponse::from);
     }
 
     public EjercicioResponse obtener(Long id) {

@@ -3,8 +3,11 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { listarSesiones } from '../api/sesionService'
 import { listarEjercicios } from '../api/ejercicioService'
+import { obtenerAnalisisMuscular } from '../api/analisisService'
 import { etiquetaGrupoMuscular } from '../constants/gruposMusculares'
+import { calcularRangoPeriodo } from '../constants/periodos'
 import LoadingSpinner from '../components/LoadingSpinner'
+import { IconVerDetalle, IconSesiones } from '../components/icons'
 
 function formatearFechaLarga(fechaIso) {
   const fecha = new Date(fechaIso)
@@ -36,16 +39,28 @@ export default function DashboardPage() {
   const { usuario } = useAuth()
   const [sesiones, setSesiones] = useState([])
   const [totalEjercicios, setTotalEjercicios] = useState(null)
+  const [sugerencia, setSugerencia] = useState(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
     let activo = true
-    Promise.all([listarSesiones(), listarEjercicios({ page: 0, size: 1 })])
-      .then(([sesionesData, ejerciciosData]) => {
+    Promise.all([
+      listarSesiones(),
+      listarEjercicios({ page: 0, size: 1 }),
+      obtenerAnalisisMuscular(calcularRangoPeriodo('30')),
+    ])
+      .then(([sesionesData, ejerciciosData, analisisData]) => {
         if (!activo) return
         setSesiones(sesionesData)
         setTotalEjercicios(ejerciciosData.totalElements)
+
+        const frecuencias = analisisData.map((d) => d.frecuencia)
+        const minimo = frecuencias.length > 0 ? Math.min(...frecuencias) : 0
+        const maximo = frecuencias.length > 0 ? Math.max(...frecuencias) : 0
+        if (minimo < maximo) {
+          setSugerencia(analisisData.find((d) => d.frecuencia === minimo))
+        }
       })
       .catch(() => {
         if (activo) setError('No se pudo cargar el resumen de tu actividad')
@@ -84,6 +99,14 @@ export default function DashboardPage() {
         </div>
       ) : (
         <>
+          {sugerencia && (
+            <p className="analisis-destacado">
+              Sugerencia: hoy podrías entrenar <strong>{etiquetaGrupoMuscular(sugerencia.grupoMuscular)}</strong>,
+              es tu grupo menos trabajado en los últimos 30 días ({sugerencia.frecuencia}{' '}
+              {sugerencia.frecuencia === 1 ? 'vez' : 'veces'}).
+            </p>
+          )}
+
           <div className="dashboard-stats">
             <div className="stat-card">
               <span className="stat-valor">{sesiones.length}</span>
@@ -102,7 +125,9 @@ export default function DashboardPage() {
           <section className="dashboard-seccion">
             <div className="page-header">
               <h2>Último entrenamiento</h2>
-              <Link to={`/sesiones/${ultimaSesion.id}`}>Ver detalle</Link>
+              <Link to={`/sesiones/${ultimaSesion.id}`} className="page-header-link">
+                <IconVerDetalle /> Ver detalle
+              </Link>
             </div>
             <p className="session-detail-fecha">{formatearFechaLarga(ultimaSesion.fecha)}</p>
             {ultimaSesion.notas && <p className="session-detail-notas">{ultimaSesion.notas}</p>}
@@ -134,7 +159,9 @@ export default function DashboardPage() {
             <section className="dashboard-seccion">
               <div className="page-header">
                 <h2>Entrenamientos recientes</h2>
-                <Link to="/sesiones">Ver historial completo</Link>
+                <Link to="/sesiones" className="page-header-link">
+                  <IconSesiones /> Ver historial completo
+                </Link>
               </div>
               <ul className="dashboard-recientes-lista">
                 {recientes.map((sesion) => (
