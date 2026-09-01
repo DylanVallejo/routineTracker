@@ -200,7 +200,7 @@ flowchart LR
     R -- "verificación / recuperación (API HTTP)" --> G[Brevo]
 ```
 
-- **Frontend**: desplegado en **Vercel** (build de Vite), apuntando a la API mediante la variable `VITE_API_URL`.
+- **Frontend**: desplegado en **Vercel** (build de Vite), apuntando a la API mediante la variable `VITE_API_URL`. Accesible mediante un dominio propio, **[www.routine-tracker.fit](https://www.routine-tracker.fit)**, además del dominio por defecto de Vercel (que sigue funcionando como respaldo).
 - **Backend**: desplegado en **Render** como Web Service a partir de un `Dockerfile` (`backend/Dockerfile`) — Render no tiene runtime nativo para Java/Maven, por eso se empaqueta en una imagen Docker de dos etapas (build con Maven, ejecución con un JRE liviano). El puerto lo asigna la plataforma en runtime a través de la variable `PORT` (`server.port=${PORT:8080}`), no queda fijo en `8080` como en local.
 - **Base de datos**: MySQL gestionada en **Clever Cloud**. El esquema se crea solo (`ddl-auto=update`) contra la base vacía en el primer arranque, incluyendo el catálogo de ejercicios por defecto.
 
@@ -211,10 +211,20 @@ El backend recibe su configuración de entorno íntegramente por variables (nunc
 | `DB_URL` | Cadena JDBC completa hacia la MySQL de Clever Cloud |
 | `DB_USERNAME` / `DB_PASSWORD` | Credenciales de esa base |
 | `JWT_SECRET` | Clave de firma de los tokens JWT (distinta a la de ejemplo del repo) |
-| `CORS_ALLOWED_ORIGIN` | Dominio del frontend permitido por CORS (Vercel) |
+| `CORS_ALLOWED_ORIGIN` | Uno o más orígenes de frontend permitidos por CORS, separados por coma (ej. `https://www.routine-tracker.fit,https://routine-tracker.fit,https://routine-tracker-theta-ashy.vercel.app`) |
 | `FRONTEND_URL` | Dominio del frontend usado para armar los enlaces de verificación/recuperación en los correos |
 | `MAIL_ENABLED` / `BREVO_API_KEY` / `MAIL_FROM` | Envío real de correo vía API HTTP de Brevo (Render bloquea los puertos SMTP salientes en su plan gratis) |
 | `PORT` | Puerto HTTP, inyectado automáticamente por Render |
+
+### Dominio propio
+
+El frontend se sirve además desde un dominio propio (`routine-tracker.fit`, comprado en Namecheap) en vez de únicamente el dominio por defecto de Vercel:
+
+1. **Vercel** (Settings → Domains): se agregó `routine-tracker.fit` como dominio del proyecto, apuntando al ambiente de Production.
+2. **DNS en Namecheap** (Advanced DNS del dominio): se configuraron los registros que indicó Vercel — un **A record** (`@` → IP de Vercel) para el dominio raíz y un **CNAME** (`www` → host `*.vercel-dns-*.com` indicado por Vercel) para el subdominio `www`, que es al que Vercel redirige (308) el dominio raíz por defecto.
+3. **Backend en Render**: `CORS_ALLOWED_ORIGIN` y `FRONTEND_URL` se actualizaron para incluir el dominio nuevo (`https://www.routine-tracker.fit`), ya que sin eso el backend rechaza las peticiones del frontend por CORS aunque el sitio cargue visualmente.
+
+El dominio del proyecto de Vercel (`routine-tracker-theta-ashy.vercel.app`) se mantiene activo en paralelo como respaldo — ambos apuntan al mismo deployment.
 
 ## Metodología
 
