@@ -4,6 +4,30 @@ Aplicación web para el seguimiento y control de rutinas de entrenamiento en gim
 
 Trabajo de titulación de Dylan Vallejo (Tecnólogo Superior en Desarrollo de Software, Instituto Superior Tecnológico Rumiñahui).
 
+## Índice
+
+- [Capturas](#capturas)
+- [Cómo funciona](#cómo-funciona)
+  - [Flujo de uso](#flujo-de-uso)
+- [Funcionalidades](#funcionalidades)
+- [Lógica de negocio y cálculos](#lógica-de-negocio-y-cálculos)
+  - [Frecuencia por grupo muscular (Análisis)](#frecuencia-por-grupo-muscular-análisis)
+  - [Volumen semanal (sets) y zonas MEV/MAV/MRV](#volumen-semanal-sets-y-zonas-mevmavmrv)
+  - [Progreso por ejercicio](#progreso-por-ejercicio)
+  - [Rangos válidos de series y repeticiones](#rangos-válidos-de-series-y-repeticiones)
+  - [Sugerencia de entrenamiento (panel de inicio)](#sugerencia-de-entrenamiento-panel-de-inicio)
+  - [Reglas de integridad de datos](#reglas-de-integridad-de-datos)
+  - [Verificación de cuenta y recuperación de contraseña](#verificación-de-cuenta-y-recuperación-de-contraseña)
+- [Stack](#stack)
+- [Estructura](#estructura)
+- [Requisitos previos](#requisitos-previos)
+- [Cómo levantar el proyecto](#cómo-levantar-el-proyecto)
+  - [Backend](#backend)
+  - [Frontend](#frontend)
+- [Despliegue](#despliegue)
+  - [Dominio propio](#dominio-propio)
+- [Metodología](#metodología)
+
 ## Capturas
 
 <table>
