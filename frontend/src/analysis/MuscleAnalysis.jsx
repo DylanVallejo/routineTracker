@@ -481,7 +481,7 @@ export default function MuscleAnalysis() {
       </div>
 
       {esPersonalizado && !rangoVolumenListo && (
-        <p className="analisis-nota">Elegí "Desde" y "Hasta" para ver ese rango.</p>
+        <p className="analisis-nota">Elige "Desde" y "Hasta" para ver ese rango.</p>
       )}
 
       {errorVolumen && <p className="auth-error">{errorVolumen}</p>}
